@@ -1,0 +1,59 @@
+<header class="top">
+  <div class="time">
+    <div class="clock">
+      {{ clock.now() | date: 'h:mm' }}<span class="ampm">{{ clock.now() | date: 'a' }}</span>
+    </div>
+    <div class="date">{{ clock.now() | date: 'EEEE, MMMM d' }}</div>
+  </div>
+
+  @if (current(); as w) {
+    <div class="now-weather">
+      <span class="icon">{{ describe(w.current.code, w.current.isDay).icon }}</span>
+      <div>
+        <div class="temp">{{ w.current.temp }}°</div>
+        <div class="muted">
+          {{ describe(w.current.code, w.current.isDay).label }}
+          @if (w.daily[0]; as t) {
+            · H {{ t.high }}° L {{ t.low }}°
+          }
+        </div>
+      </div>
+    </div>
+  } @else if (weather.state().status === 'unconfigured') {
+    <div class="now-weather muted small">Set WALL_LAT / WALL_LON for weather</div>
+  } @else if (weather.state().status === 'error') {
+    <div class="now-weather muted small">Weather unavailable</div>
+  }
+</header>
+
+<main class="grid">
+  <section class="card agenda">
+    <h2>Today</h2>
+    <p class="empty">Calendar not connected yet.</p>
+  </section>
+
+  <section class="card chores">
+    <h2>Chores</h2>
+    <p class="empty">No chores yet.</p>
+  </section>
+
+  <section class="card week">
+    <h2>This week</h2>
+    <div class="forecast">
+      @for (d of current()?.daily ?? []; track d.date; let first = $first) {
+        <div class="day" [class.today]="first">
+          <div class="dow">{{ first ? 'Today' : (day(d.date) | date: 'EEE') }}</div>
+          <div class="icon">{{ describe(d.code).icon }}</div>
+          <div class="hl">
+            <strong>{{ d.high }}°</strong> <span class="muted">{{ d.low }}°</span>
+          </div>
+          @if (d.precipChance >= 20) {
+            <div class="precip">💧 {{ d.precipChance }}%</div>
+          }
+        </div>
+      } @empty {
+        <p class="empty">Forecast unavailable.</p>
+      }
+    </div>
+  </section>
+</main>

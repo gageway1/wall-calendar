@@ -1,1 +1,59 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  color-scheme: dark;
+  --bg: #0f1115;
+  --surface: #181b22;
+  --surface-2: #232733;
+  --text: #eef0f4;
+  --text-muted: #9aa1ae;
+  --accent: #6cb6ff;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --gap: 1.5rem;
+
+  // Scale off the viewport so 1080p and 4K panels read the same from across the room.
+  font-size: clamp(14px, 1.05vw, 28px);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+  overflow: hidden;
+  // Touch kiosk: no text selection, no long-press callouts, no double-tap zoom.
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h2 {
+  margin: 0 0 1rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  min-height: 0;
+  overflow: auto;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.empty {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}

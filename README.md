@@ -1,59 +1,42 @@
-# WallCalendar
+# Wall Calendar
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.0.
+A self-hosted family wall calendar: an Angular app plus a small Express API and SQLite, running as a
+single Node process on a mini PC with a touch monitor. It's a DIY replacement for Skylight, Hearth
+and similar units.
 
-## Development server
+## Dev
 
-To start a local development server, run:
-
-```bash
-ng serve
+```sh
+cp .env.example .env   # set WALL_LAT / WALL_LON for weather
+npm install
+npm start              # http://localhost:4200, with /api served by src/server.ts
+npm test
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Node 24+ is required (the app uses the built-in `node:sqlite`).
 
-## Code scaffolding
+## Prod
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```sh
+npm run build
+npm run serve:prod     # http://localhost:4000
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Layout
 
-```bash
-ng generate --help
-```
+- `src/app/`: the Angular UI. Every route renders client-side (`app.routes.server.ts`).
+- `src/server.ts`: the Express entry point. It mounts `/api` and serves the SPA.
+- `src/server/`: the API, the SQLite database (`db.ts`, append-only migrations) and the weather proxy.
+- `data/`: the SQLite file. It's gitignored, so back it up.
 
-## Building
+`allowedHosts` is `*` because this runs only on a LAN and nothing is rendered on the server. Don't
+expose it to the internet.
 
-To build the project run:
+## Roadmap
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. ✅ Skeleton: Home screen with clock and weather, SQLite schema
+2. Google Calendar sync, read-only: OAuth, calendar-to-person mapping, agenda/week/month views
+3. Writes: quick-add on the wall, full form on phones
+4. Chores, meal plan, grocery list
+5. Box: `setup.sh` (Ubuntu Server + cage + Chromium kiosk + systemd), dimming schedule
+6. Polish: touch targets, return to Home when idle, readability from across the room
