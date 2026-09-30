@@ -1,5 +1,64 @@
 :host {
-  display: block;
-  height: 100dvh;
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: var(--gap) 0.5rem;
+  background: var(--surface);
+}
+
+.rail-item {
+  display: grid;
+  justify-items: center;
+  gap: 0.3rem;
+  width: 5.5rem;
+  padding: 0.9rem 0;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  app-icon {
+    font-size: 1.1rem;
+  }
+
+  &.active {
+    background: var(--surface-2);
+    color: var(--accent);
+  }
+}
+
+.content {
+  min-width: 0;
+  min-height: 0;
   padding: var(--gap);
+}
+
+// Phones: bottom tab bar.
+@media (max-width: 700px) {
+  :host {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+  .rail {
+    order: 2;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 0.25rem;
+  }
+  .rail-item {
+    width: auto;
+    flex: 1;
+    padding: 0.5rem 0;
+  }
+  .content {
+    padding: 1rem;
+  }
 }

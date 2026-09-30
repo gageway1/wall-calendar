@@ -3,6 +3,7 @@
   grid-template-rows: auto 1fr;
   gap: var(--gap);
   height: 100%;
+  min-height: 0;
 }
 
 .top {
@@ -50,7 +51,7 @@
 .grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: var(--gap);
   min-height: 0;
 }
@@ -68,42 +69,157 @@
 .week {
   grid-row: 2;
   grid-column: 1 / -1;
+  padding: 1rem;
 }
 
-.forecast {
+// Today agenda rows: big enough to read from across the kitchen.
+.item {
+  all: unset;
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: 6.5rem 0.35rem 1fr;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.7rem 0.5rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+
+  & + & {
+    margin-top: 0.25rem;
+  }
+
+  &:active {
+    background: var(--surface-2);
+  }
+
+  &.done {
+    opacity: 0.45;
+  }
+}
+
+.when {
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  align-self: stretch;
+  border-radius: 999px;
+  background: var(--c);
+}
+
+.what {
+  display: grid;
+  min-width: 0;
+}
+
+.title {
+  font-size: 1.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 0.5rem;
 }
 
 .day {
-  text-align: center;
-  padding: 0.75rem 0.25rem;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 0.5rem;
+  min-height: 9.5rem;
+  padding: 0.6rem;
   border-radius: var(--radius-sm);
+  cursor: pointer;
 
   &.today {
     background: var(--surface-2);
   }
 
-  .dow {
-    font-weight: 600;
+  &:active {
+    background: var(--surface-2);
   }
+}
 
-  .icon {
-    font-size: 2.25rem;
-    margin: 0.25rem 0;
-  }
+.day-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.25rem;
+}
 
-  .low {
-    margin-left: 0.5rem;
-  }
+.dow {
+  font-weight: 600;
+}
 
-  .precip {
-    font-size: 0.9rem;
-    color: var(--accent);
+.wx {
+  font-size: 0.95rem;
+  white-space: nowrap;
+
+  .muted {
+    margin-left: 0.3rem;
   }
+}
+
+.pills {
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+}
+
+.more {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding-left: 0.4rem;
 }
 
 .small {
   font-size: 1rem;
+}
+
+@media (max-width: 700px) {
+  :host {
+    overflow-y: auto;
+  }
+  .clock {
+    font-size: 3.5rem;
+  }
+  .date {
+    font-size: 1.2rem;
+  }
+  .now-weather .icon {
+    font-size: 2.5rem;
+  }
+  .now-weather .temp {
+    font-size: 2.5rem;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+  }
+  .agenda,
+  .chores,
+  .week {
+    grid-row: auto;
+    grid-column: auto;
+  }
+  .days {
+    grid-template-columns: 1fr;
+  }
+  .day {
+    min-height: 0;
+  }
 }

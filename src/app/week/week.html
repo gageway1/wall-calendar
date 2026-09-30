@@ -1,0 +1,36 @@
+<header class="bar">
+  <div class="nav">
+    <button type="button" class="icon-btn" aria-label="Previous week" (click)="shift(-1)">
+      <app-icon name="left" />
+    </button>
+    <button type="button" class="btn" [disabled]="offset() === 0" (click)="offset.set(0)">
+      Today
+    </button>
+    <button type="button" class="icon-btn" aria-label="Next week" (click)="shift(1)">
+      <app-icon name="right" />
+    </button>
+    <h1>{{ title() }}</h1>
+  </div>
+  <app-person-filter />
+</header>
+
+<div class="cols" appSwipe (swipeLeft)="shift(1)" (swipeRight)="shift(-1)">
+  @for (d of days(); track d.key) {
+    <section class="col card" [class.today]="d.isToday" [class.past]="d.isPast">
+      <div class="head">
+        <div>
+          <div class="dow">{{ d.dow }}</div>
+          <div class="num">{{ d.num }}</div>
+        </div>
+        @if (d.weather; as w) {
+          <div class="wx">{{ w.icon }} {{ w.high }}°</div>
+        }
+      </div>
+      <div class="list">
+        @for (e of d.events; track e.id) {
+          <app-event-pill [event]="e" [day]="d.key" />
+        }
+      </div>
+    </section>
+  }
+</div>

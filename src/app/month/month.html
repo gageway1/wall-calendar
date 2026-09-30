@@ -1,0 +1,37 @@
+<header class="bar">
+  <div class="nav">
+    <button type="button" class="icon-btn" aria-label="Previous month" (click)="shift(-1)">
+      <app-icon name="left" />
+    </button>
+    <button type="button" class="btn" [disabled]="offset() === 0" (click)="offset.set(0)">
+      Today
+    </button>
+    <button type="button" class="icon-btn" aria-label="Next month" (click)="shift(1)">
+      <app-icon name="right" />
+    </button>
+    <h1>{{ title() }}</h1>
+  </div>
+  <app-person-filter />
+</header>
+
+<div class="grid card" appSwipe (swipeLeft)="shift(1)" (swipeRight)="shift(-1)">
+  @for (w of weekdays(); track $index) {
+    <div class="dow">{{ w }}</div>
+  }
+  @for (c of cells(); track c.key) {
+    <div
+      class="cell"
+      [class.out]="!c.inMonth"
+      [class.today]="c.isToday"
+      (click)="dialogs.openDay(c.key, c.all)"
+    >
+      <div class="num">{{ c.num }}</div>
+      @for (e of c.shown; track e.id) {
+        <app-event-pill [event]="e" [day]="c.key" [compact]="true" />
+      }
+      @if (c.more) {
+        <div class="more">+{{ c.more }} more</div>
+      }
+    </div>
+  }
+</div>

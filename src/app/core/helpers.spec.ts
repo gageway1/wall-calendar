@@ -1,4 +1,4 @@
-import { toLocalDate } from './clock.service';
+import { dayKey as toLocalDate } from './date';
 import { describeWeather } from './weather.service';
 
 describe('toLocalDate', () => {

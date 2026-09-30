@@ -1,0 +1,47 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.pill {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  gap: 0.4rem;
+  align-items: baseline;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  border-left: 0.3rem solid var(--c);
+  background: color-mix(in srgb, var(--c) 18%, var(--surface));
+  cursor: pointer;
+  line-height: 1.25;
+
+  &.all-day {
+    background: color-mix(in srgb, var(--c) 45%, var(--surface));
+  }
+
+  &.compact {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.85rem;
+    border-left-width: 0.2rem;
+  }
+
+  &:active {
+    filter: brightness(1.25);
+  }
+}
+
+.time {
+  flex: none;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--c) 60%, var(--text));
+}
+
+.title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

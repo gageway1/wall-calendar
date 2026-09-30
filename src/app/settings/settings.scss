@@ -1,0 +1,139 @@
+:host {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--gap);
+  height: 100%;
+  min-height: 0;
+}
+
+.scroll {
+  display: grid;
+  align-content: start;
+  gap: var(--gap);
+  max-width: 60rem;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.small {
+  font-size: 0.9rem;
+}
+
+code {
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: var(--surface-2);
+  user-select: text;
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+
+  &.error {
+    background: color-mix(in srgb, #ff6b6b 20%, var(--surface));
+  }
+
+  &.ok {
+    background: color-mix(in srgb, #51cf66 20%, var(--surface));
+  }
+}
+
+.account {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.email {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cal-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.cal {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+
+  &:not(.mapped) {
+    opacity: 0.8;
+  }
+}
+
+.swatch {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+
+  &.hollow {
+    border: 3px solid;
+  }
+}
+
+.cal-main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.name {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+input.name {
+  all: unset;
+  font-size: 1.15rem;
+  font-weight: 600;
+  padding: 0.2rem 0.4rem;
+  margin-left: -0.4rem;
+  border-radius: 6px;
+  user-select: text;
+
+  &:focus {
+    background: var(--bg);
+    outline: 2px solid var(--accent);
+  }
+}
+
+.warn {
+  color: #ffa94d;
+}
+
+.palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.color {
+  all: unset;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  cursor: pointer;
+
+  &.selected {
+    box-shadow:
+      0 0 0 3px var(--surface-2),
+      0 0 0 5px var(--text);
+  }
+}

@@ -1,0 +1,111 @@
+<header class="bar">
+  <div class="nav"><h1>Settings</h1></div>
+</header>
+
+<div class="scroll">
+  <section class="card">
+    <h2>Google account</h2>
+
+    @if (callbackError(); as err) {
+      <p class="alert error">Google sign-in failed: {{ err }}</p>
+    }
+    @if (justConnected()) {
+      <p class="alert ok">Connected. Now add calendars below.</p>
+    }
+
+    @if (status(); as s) {
+      @if (!s.configured) {
+        <p class="muted">
+          Set <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> in
+          <code>.env</code>, then restart.
+        </p>
+      } @else if (!s.connected) {
+        @if (s.error) {
+          <p class="alert error">{{ s.error }}</p>
+        }
+        @if (onLocalhost) {
+          <a class="btn primary" href="/api/google/setup">Connect Google account</a>
+        } @else {
+          <p class="muted">
+            Google only allows sign-in through <code>http://localhost</code>. From your PC run
+            <code>ssh -L 4000:localhost:4000 &lt;this box&gt;</code>, then open
+            <code>http://localhost:4000/settings</code>.
+          </p>
+        }
+      } @else {
+        <div class="account">
+          <div>
+            <div class="email">{{ s.account ?? 'Connected' }}</div>
+            <div class="muted small">Last sync: {{ formatTime(s.lastSyncAt) }}</div>
+            @if (s.error) {
+              <div class="alert error">{{ s.error }}</div>
+            }
+          </div>
+          <div class="actions">
+            <button type="button" class="btn" [disabled]="syncing()" (click)="syncNow()">
+              {{ syncing() ? 'Syncing…' : 'Sync now' }}
+            </button>
+            <button type="button" class="btn danger" (click)="disconnect()">Disconnect</button>
+          </div>
+        </div>
+      }
+    }
+  </section>
+
+  @if (status()?.connected) {
+    <section class="card">
+      <h2>Calendars</h2>
+      <p class="muted small">
+        Each calendar shared with the household account can be shown on the wall as a person.
+      </p>
+
+      <div class="cal-list">
+        @for (r of rows(); track r.cal.id) {
+          <div class="cal" [class.mapped]="r.person">
+            @if (r.person; as p) {
+              <span class="swatch" [style.background]="p.color"></span>
+              <div class="cal-main">
+                <input
+                  class="name"
+                  [value]="p.name"
+                  (keydown.enter)="$any($event.target).blur()"
+                  (blur)="rename(p, $any($event.target).value)"
+                />
+                <div class="muted small">
+                  {{ r.cal.name }}
+                  @if (r.cal.accessRole === 'reader' || r.cal.accessRole === 'freeBusyReader') {
+                    · <span class="warn">read-only: quick-add won't work</span>
+                  }
+                </div>
+                <div class="palette">
+                  @for (c of colors; track c) {
+                    <button
+                      type="button"
+                      class="color"
+                      [class.selected]="c === p.color"
+                      [style.background]="c"
+                      [attr.aria-label]="'Color ' + c"
+                      (click)="recolor(p, c)"
+                    ></button>
+                  }
+                </div>
+              </div>
+              <button type="button" class="btn danger" (click)="remove(p)">Remove</button>
+            } @else {
+              <span class="swatch hollow" [style.border-color]="r.cal.color"></span>
+              <div class="cal-main">
+                <div class="name">{{ r.cal.name }}</div>
+                <div class="muted small">{{ r.cal.id }}</div>
+              </div>
+              <button type="button" class="btn primary" (click)="addPerson(r.cal)">
+                Add to wall
+              </button>
+            }
+          </div>
+        } @empty {
+          <p class="empty">Loading calendars…</p>
+        }
+      </div>
+    </section>
+  }
+</div>

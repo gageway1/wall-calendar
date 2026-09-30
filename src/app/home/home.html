@@ -29,7 +29,35 @@
 <main class="grid">
   <section class="card agenda">
     <h2>Today</h2>
-    <p class="empty">Calendar not connected yet.</p>
+    @for (a of agenda(); track a.event.id) {
+      <button
+        type="button"
+        class="item"
+        [class.done]="a.done"
+        [style.--c]="a.event.color"
+        (click)="dialogs.openEvent(a.event)"
+      >
+        <span class="when">{{ a.time }}</span>
+        <span class="bar"></span>
+        <span class="what">
+          <span class="title">{{ a.event.title }}</span>
+          <span class="meta">
+            {{ a.event.personName }}
+            @if (a.event.location) {
+              · {{ a.event.location }}
+            }
+          </span>
+        </span>
+      </button>
+    } @empty {
+      <p class="empty">
+        @if (people.people().length) {
+          Nothing on the calendar today.
+        } @else {
+          No calendars on the wall yet. Add some in Settings.
+        }
+      </p>
+    }
   </section>
 
   <section class="card chores">
@@ -38,21 +66,26 @@
   </section>
 
   <section class="card week">
-    <h2>This week</h2>
-    <div class="forecast">
-      @for (d of current()?.daily ?? []; track d.date; let first = $first) {
-        <div class="day" [class.today]="first">
-          <div class="dow">{{ first ? 'Today' : (day(d.date) | date: 'EEE') }}</div>
-          <div class="icon">{{ describe(d.code).icon }}</div>
-          <div class="hl">
-            <strong>{{ d.high }}°</strong> <span class="muted">{{ d.low }}°</span>
+    <div class="days">
+      @for (d of week(); track d.key; let first = $first) {
+        <div class="day" [class.today]="first" (click)="dialogs.openDay(d.key, d.all)">
+          <div class="day-head">
+            <span class="dow">{{ d.label }}</span>
+            @if (d.forecast; as f) {
+              <span class="wx">
+                {{ describe(f.code).icon }} {{ f.high }}°<span class="muted">{{ f.low }}°</span>
+              </span>
+            }
           </div>
-          @if (d.precipChance >= 20) {
-            <div class="precip">💧 {{ d.precipChance }}%</div>
-          }
+          <div class="pills">
+            @for (e of d.shown; track e.id) {
+              <app-event-pill [event]="e" [day]="d.key" [compact]="true" />
+            }
+            @if (d.more) {
+              <div class="more">+{{ d.more }} more</div>
+            }
+          </div>
         </div>
-      } @empty {
-        <p class="empty">Forecast unavailable.</p>
       }
     </div>
   </section>

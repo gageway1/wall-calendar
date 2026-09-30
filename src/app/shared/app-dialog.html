@@ -1,0 +1,39 @@
+@if (dialogs.state(); as s) {
+  <div class="backdrop" (click)="dialogs.close()">
+    <div class="panel" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <button type="button" class="close" aria-label="Close" (click)="dialogs.close()">
+        <app-icon name="close" />
+      </button>
+
+      @switch (s.kind) {
+        @case ('event') {
+          @if (s.kind === 'event') {
+            <div class="person" [style.--c]="s.event.color">
+              <span class="dot"></span>{{ s.event.personName }}
+            </div>
+            <h2 class="title">{{ s.event.title }}</h2>
+            <p class="when">{{ describeWhen(s.event) }}</p>
+            @if (s.event.location) {
+              <p class="location">📍 {{ s.event.location }}</p>
+            }
+            @if (descriptionText()) {
+              <p class="description">{{ descriptionText() }}</p>
+            }
+          }
+        }
+        @case ('day') {
+          @if (s.kind === 'day') {
+            <h2 class="title">{{ dayTitle() }}</h2>
+            <div class="day-list">
+              @for (e of s.events; track e.id) {
+                <app-event-pill [event]="e" [day]="s.day" />
+              } @empty {
+                <p class="empty">Nothing scheduled.</p>
+              }
+            </div>
+          }
+        }
+      }
+    </div>
+  </div>
+}

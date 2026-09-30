@@ -1,0 +1,84 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 0.6);
+  animation: fade 120ms ease-out;
+}
+
+.panel {
+  position: relative;
+  width: min(40rem, 100%);
+  max-height: 85dvh;
+  overflow: auto;
+  padding: 2rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / 0.5);
+}
+
+.close {
+  all: unset;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-muted);
+
+  &:active {
+    background: var(--surface-2);
+  }
+}
+
+.person {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--c) 70%, var(--text));
+
+  .dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--c);
+  }
+}
+
+.title {
+  margin: 0.5rem 2.5rem 0.75rem 0;
+  font-size: 1.8rem;
+}
+
+.when {
+  font-size: 1.2rem;
+  margin: 0 0 0.75rem;
+}
+
+.location,
+.description {
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.description {
+  white-space: pre-line;
+  user-select: text;
+}
+
+.day-list {
+  display: grid;
+  gap: 0.5rem;
+  font-size: 1.15rem;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}

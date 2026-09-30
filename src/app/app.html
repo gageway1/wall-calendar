@@ -1,1 +1,19 @@
-<router-outlet />
+<nav class="rail">
+  @for (n of nav; track n.path) {
+    <a
+      class="rail-item"
+      [routerLink]="n.path"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: n.path === '/' }"
+    >
+      <app-icon [name]="n.icon" />
+      <span>{{ n.label }}</span>
+    </a>
+  }
+</nav>
+
+<main class="content">
+  <router-outlet />
+</main>
+
+<app-dialog />
