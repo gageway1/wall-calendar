@@ -10,7 +10,7 @@ export class PeopleService {
   private readonly http = inject(HttpClient);
 
   readonly people = signal<Person[]>([]);
-  /** People filtered out of the views. Per-screen, so the wall and a phone can differ. */
+  /** People filtered out of the views. Remembered per browser. */
   readonly hidden = signal<ReadonlySet<number>>(loadHidden());
 
   constructor() {

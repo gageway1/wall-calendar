@@ -120,28 +120,3 @@ h2 {
   width: 3.2rem;
   height: 3.2rem;
 }
-
-@media (max-width: 700px) {
-  .bar {
-    h1 {
-      font-size: 1.3rem;
-      margin-left: 0.25rem;
-    }
-
-    .icon-btn {
-      width: 2.6rem;
-      height: 2.6rem;
-    }
-
-    .btn {
-      padding: 0.5rem 1rem;
-    }
-
-    // Person chips scroll sideways instead of widening the page.
-    app-person-filter {
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      max-width: 100%;
-    }
-  }
-}

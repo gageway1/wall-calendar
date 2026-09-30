@@ -48,8 +48,8 @@ expose it to the internet.
 ## Roadmap
 
 1. ✅ Skeleton: Home screen with clock and weather, SQLite schema
-2. ✅ Google Calendar sync, read-only: OAuth, calendar-to-person mapping, agenda/week/month views
-3. Writes: quick-add on the wall, full form on phones
+2. ✅ Google Calendar sync: OAuth, calendar-to-person mapping, agenda/week/month views
+3. ~~Writes~~: dropped. Events are created in the Google Calendar app.
 4. Chores, meal plan, grocery list
 5. Box: `setup.sh` (Ubuntu Server + cage + Chromium kiosk + systemd), dimming schedule
 6. Polish: touch targets, return to Home when idle, readability from across the room

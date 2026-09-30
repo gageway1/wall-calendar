@@ -40,25 +40,3 @@
   min-height: 0;
   padding: var(--gap);
 }
-
-// Phones: bottom tab bar.
-@media (max-width: 700px) {
-  :host {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr auto;
-  }
-  .rail {
-    order: 2;
-    flex-direction: row;
-    justify-content: space-around;
-    padding: 0.25rem;
-  }
-  .rail-item {
-    width: auto;
-    flex: 1;
-    padding: 0.5rem 0;
-  }
-  .content {
-    padding: 1rem;
-  }
-}
