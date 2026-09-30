@@ -73,6 +73,9 @@
                 />
                 <div class="muted small">
                   {{ r.cal.name }}
+                  @if (r.cal.accessRole === 'reader' || r.cal.accessRole === 'freeBusyReader') {
+                    · <span class="warn">read-only: quick-add won't work</span>
+                  }
                 </div>
                 <div class="palette">
                   @for (c of colors; track c) {
