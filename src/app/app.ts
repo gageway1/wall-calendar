@@ -42,7 +42,11 @@ const SHIFT_MS = 15 * 60 * 1000;
   selector: 'app-root',
   styleUrl: './app.scss',
   templateUrl: './app.html',
-  host: { '[style.transform]': 'shift()' },
+  host: {
+    '[style.transform]': 'shift()',
+    '(document:pointerdown)': 'lastPointer = $event.pointerType',
+    '(document:contextmenu)': 'blockTouchMenu($event)',
+  },
 })
 export class App implements OnDestroy {
   protected readonly quickAdd = inject(QuickAddService);
@@ -54,6 +58,18 @@ export class App implements OnDestroy {
   private readonly weather = inject(WeatherService);
 
   protected readonly wifiOpen = signal(false);
+
+  /** Most recent input type; long-press menus only come from touch or pen. */
+  protected lastPointer = 'mouse';
+
+  /**
+   * No long-press menu on the wall (Chrome ignores -webkit-touch-callout). A real mouse
+   * right-click still works, so Inspect stays available while developing.
+   */
+  protected blockTouchMenu(e: MouseEvent) {
+    const type = (e as PointerEvent).pointerType || this.lastPointer;
+    if (type !== 'mouse') e.preventDefault();
+  }
 
   protected readonly nav: { path: string; label: string; icon: IconName }[] = [
     { path: '/', label: 'Home', icon: 'home' },
