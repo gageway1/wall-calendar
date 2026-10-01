@@ -1,6 +1,7 @@
 import { Component, OnDestroy, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { DialogService } from './core/dialog.service';
+import { NightlyReloadService } from './core/nightly-reload.service';
 import { QuickAddService } from './core/quick-add.service';
 import { SleepService } from './core/sleep.service';
 import { TimerService } from './core/timer.service';
@@ -56,6 +57,7 @@ export class App implements OnDestroy {
   private readonly router = inject(Router);
   // Start weather at boot so the night screen has it even if Home was never opened.
   private readonly weather = inject(WeatherService);
+  private readonly nightlyReload = inject(NightlyReloadService);
 
   protected readonly wifiOpen = signal(false);
 

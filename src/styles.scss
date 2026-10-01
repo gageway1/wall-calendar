@@ -28,6 +28,8 @@ body {
   color: var(--text);
   font-family: Inter, system-ui, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
   overflow: hidden;
+  // No pull-to-refresh or rubber-band bounce on the touch panel.
+  overscroll-behavior: none;
   // Touch kiosk: no text selection, no double-tap zoom. (Long-press menus: see App.blockTouchMenu.)
   user-select: none;
   touch-action: manipulation;
