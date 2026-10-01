@@ -3,9 +3,11 @@ import { NotConnectedError } from './google/oauth';
 import { log } from './logger';
 import { networkErrorCode } from './net-errors';
 import { ensureSyncLoop } from './google/sync';
+import { chores } from './routes/chores';
 import { events } from './routes/events';
 import { google } from './routes/google';
 import { logs } from './routes/logs';
+import { meals } from './routes/meals';
 import { people } from './routes/people';
 import { getWeather } from './weather';
 
@@ -40,6 +42,8 @@ api.use('/google', google);
 api.use('/people', people);
 api.use('/events', events);
 api.use('/logs', logs);
+api.use('/chores', chores);
+api.use('/meals', meals);
 
 api.use((_req, res) => {
   res.status(404).json({ error: 'not_found' });

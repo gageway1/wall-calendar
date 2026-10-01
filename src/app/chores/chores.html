@@ -1,0 +1,69 @@
+<header class="bar">
+  <div class="nav"><h1>Chores</h1></div>
+</header>
+
+@if (columns().length) {
+  <div class="cols">
+    @for (col of columns(); track col.person.id) {
+      <section class="col card" [style.--c]="col.person.color">
+        <div class="head">
+          <span class="dot"></span>
+          <span class="name">{{ col.person.name }}</span>
+          @if (col.streak) {
+            <span class="streak" title="Days in a row">🔥 {{ col.streak }}</span>
+          }
+        </div>
+
+        <div class="list">
+          @for (row of col.chores; track row.chore.id) {
+            <div class="row">
+              @if (row.today; as t) {
+                <button
+                  type="button"
+                  class="check"
+                  [class.done]="t.done"
+                  [attr.aria-label]="t.done ? 'Mark not done' : 'Mark done'"
+                  (click)="chores.toggle(t)"
+                >
+                  @if (t.done) {
+                    ✓
+                  }
+                </button>
+              } @else {
+                <span class="check off" title="Not due today"></span>
+              }
+              <button
+                type="button"
+                class="chore"
+                (click)="editing.set({ chore: row.chore, personId: null })"
+              >
+                <span class="title" [class.done]="row.today?.done">{{ row.chore.title }}</span>
+                <span class="when" [class.overdue]="row.today?.overdue">
+                  {{ row.today?.overdue ? 'Overdue · ' : '' }}{{ describe(row.chore.recurrence) }}
+                </span>
+              </button>
+            </div>
+          } @empty {
+            <p class="empty">No chores yet.</p>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="btn add"
+          (click)="editing.set({ chore: null, personId: col.person.id })"
+        >
+          + Add chore
+        </button>
+      </section>
+    }
+  </div>
+} @else {
+  <section class="card">
+    <p class="empty">Add the family in Settings → People first.</p>
+  </section>
+}
+
+@if (editing(); as e) {
+  <app-chore-editor [chore]="e.chore" [personId]="e.personId" (closed)="editing.set(null)" />
+}

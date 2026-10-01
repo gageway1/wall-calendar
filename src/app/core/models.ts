@@ -60,3 +60,36 @@ export const PERSON_COLORS = [
   '#22b8cf',
   '#fcc419',
 ];
+
+export type Recurrence =
+  | { kind: 'daily' }
+  | { kind: 'weekly'; days: number[] } // 0 = Sunday
+  | { kind: 'once'; date: string };
+
+export interface Chore {
+  id: number;
+  personId: number;
+  title: string;
+  recurrence: Recurrence;
+  createdOn: string;
+  archivedOn: string | null;
+}
+
+/** A chore as it appears on one day's list. */
+export interface ChoreItem extends Chore {
+  done: boolean;
+  /** A one-time task past its date and not yet done. */
+  overdue: boolean;
+}
+
+export interface ChoreDay {
+  day: string;
+  items: ChoreItem[];
+  /** personId → days in a row. */
+  streaks: Record<number, number>;
+}
+
+export interface Meal {
+  day: string;
+  title: string;
+}

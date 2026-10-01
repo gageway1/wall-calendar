@@ -123,9 +123,10 @@ export class QuickAdd implements OnInit {
     return t === '' || /[.!?]\s$/.test(t);
   });
 
-  /** Recent titles matching what's typed; the selected person's own titles first. */
+  /** Recent titles matching what's typed (all of them until editing starts); own titles first. */
   protected readonly titleSuggestions = computed(() => {
-    const q = this.title().trim().toLowerCase();
+    const typed = this.title() !== (this.editing()?.title ?? '');
+    const q = typed ? this.title().trim().toLowerCase() : '';
     const person = this.personId();
     const seen = new Set<string>();
     return [...this.suggestions()]
@@ -135,7 +136,7 @@ export class QuickAdd implements OnInit {
       )
       .filter((s) => {
         const key = s.title.toLowerCase();
-        if (seen.has(key) || key === q || (q && !key.includes(q))) return false;
+        if (seen.has(key) || (q && (key === q || !key.includes(q)))) return false;
         seen.add(key);
         return true;
       })

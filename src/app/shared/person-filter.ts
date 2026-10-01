@@ -5,7 +5,7 @@ import { PeopleService } from '../core/people.service';
 @Component({
   selector: 'app-person-filter',
   template: `
-    @for (p of people.people(); track p.id) {
+    @for (p of people.withCalendar(); track p.id) {
       <button
         type="button"
         class="chip"

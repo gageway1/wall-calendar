@@ -7,6 +7,7 @@ import { reportError } from '../core/error-reporting';
 import { KeyboardService } from '../core/keyboard.service';
 import { GoogleCalendar, GoogleStatus, PERSON_COLORS, Person } from '../core/models';
 import { PeopleService } from '../core/people.service';
+import { TextPromptService } from '../core/text-prompt.service';
 import { GENERIC_ERROR, ToastService } from '../core/toast.service';
 
 interface LogEntry {
@@ -28,6 +29,7 @@ export class Settings {
   protected readonly colors = PERSON_COLORS;
   protected readonly keyboard = inject(KeyboardService);
   protected readonly toasts = inject(ToastService);
+  private readonly prompt = inject(TextPromptService);
 
   private readonly query = toSignal(inject(ActivatedRoute).queryParamMap);
   protected readonly callbackError = computed(() => !!this.query()?.get('google_error'));
@@ -39,11 +41,13 @@ export class Settings {
   /** Google sign-in only works through http://localhost (see README). */
   protected readonly onLocalhost = ['localhost', '127.0.0.1'].includes(location.hostname);
 
-  /** Every Google calendar, paired with the person it's mapped to (if any). */
-  protected readonly rows = computed(() => {
-    const byCalendar = new Map(this.peopleSvc.people().map((p) => [p.calendarId, p]));
-    return this.calendars().map((cal) => ({ cal, person: byCalendar.get(cal.id) }));
+  /** Google calendars nobody is linked to yet. */
+  protected readonly unlinkedCalendars = computed(() => {
+    const linked = new Set(this.peopleSvc.people().map((p) => p.calendarId));
+    return this.calendars().filter((c) => !linked.has(c.id));
   });
+
+  protected readonly confirmRemove = signal<number | null>(null);
 
   constructor() {
     this.loadStatus();
@@ -87,11 +91,42 @@ export class Settings {
     });
   }
 
-  protected addPerson(cal: GoogleCalendar) {
-    const used = new Set(this.peopleSvc.people().map((p) => p.color));
-    const color = this.colors.find((c) => !used.has(c)) ?? this.colors[0];
+  /** Calendars a person can pick: their own plus any nobody else has. */
+  protected calendarChoices(p: Person) {
+    const takenByOthers = new Set(
+      this.peopleSvc
+        .people()
+        .filter((o) => o.id !== p.id)
+        .map((o) => o.calendarId),
+    );
+    return this.calendars().filter((c) => !takenByOthers.has(c.id));
+  }
+
+  protected calendarKnown(id: string) {
+    return this.calendars().some((c) => c.id === id);
+  }
+
+  protected async addPerson() {
+    const name = await this.prompt.ask({
+      title: 'New person',
+      placeholder: 'Name',
+      maxLength: 40,
+      confirm: 'Add',
+    });
+    if (!name) return;
     this.peopleSvc
-      .create({ name: cal.name, color, calendarId: cal.id, accessRole: cal.accessRole })
+      .create({ name, color: this.peopleSvc.nextColor(this.colors) })
+      .subscribe(() => this.toasts.success(`${name} added`));
+  }
+
+  protected addFromCalendar(cal: GoogleCalendar) {
+    this.peopleSvc
+      .create({
+        name: cal.name,
+        color: this.peopleSvc.nextColor(this.colors),
+        calendarId: cal.id,
+        accessRole: cal.accessRole,
+      })
       // Initial sync runs server-side; give it a moment before refetching events.
       .subscribe(() => {
         this.toasts.success(`${cal.name} added to the wall`);
@@ -99,13 +134,23 @@ export class Settings {
       });
   }
 
-  protected rename(p: Person, name: string) {
-    if (name.trim() && name.trim() !== p.name) {
-      this.peopleSvc.update(p.id, { name }).subscribe(() => {
-        this.toasts.success('Name saved');
-        this.events.refresh();
+  protected async rename(p: Person) {
+    const name = await this.prompt.ask({ title: 'Rename', value: p.name, maxLength: 40 });
+    if (!name || name === p.name) return;
+    this.peopleSvc.update(p.id, { name }).subscribe(() => {
+      this.toasts.success('Name saved');
+      this.events.refresh();
+    });
+  }
+
+  protected link(p: Person, calendarId: string) {
+    const cal = this.calendars().find((c) => c.id === calendarId);
+    this.peopleSvc
+      .update(p.id, { calendarId: calendarId || null, accessRole: cal?.accessRole })
+      .subscribe(() => {
+        this.toasts.success(cal ? `Linked ${cal.name}` : `${p.name} is wall-only now`);
+        setTimeout(() => this.events.refresh(), cal ? 3000 : 0);
       });
-    }
   }
 
   protected recolor(p: Person, color: string) {
@@ -115,8 +160,13 @@ export class Settings {
     });
   }
 
+  /** Two taps: removing a person also removes their chores. */
   protected remove(p: Person) {
-    if (!confirm(`Remove ${p.name} from the wall? (Their Google calendar is not touched.)`)) return;
+    if (this.confirmRemove() !== p.id) {
+      this.confirmRemove.set(p.id);
+      return;
+    }
+    this.confirmRemove.set(null);
     this.peopleSvc.remove(p.id).subscribe(() => {
       this.toasts.success(`${p.name} removed from the wall`);
       this.events.refresh();

@@ -12,7 +12,7 @@
         <section>
           <div class="label">Who</div>
           <div class="chips">
-            @for (p of people.people(); track p.id) {
+            @for (p of people.withCalendar(); track p.id) {
               <button
                 type="button"
                 class="chip"

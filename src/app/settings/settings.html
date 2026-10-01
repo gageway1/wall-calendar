@@ -4,6 +4,79 @@
 
 <div class="scroll">
   <section class="card">
+    <div class="card-head">
+      <h2>People</h2>
+      <button type="button" class="btn primary" (click)="addPerson()">+ Add person</button>
+    </div>
+    <p class="muted small">
+      Everyone gets a color and their own chores. Link a Google calendar to show their events too;
+      kids can be wall-only, no account needed.
+    </p>
+
+    <div class="people">
+      @for (p of peopleSvc.people(); track p.id) {
+        <div class="person">
+          <span class="swatch" [style.background]="p.color"></span>
+          <div class="person-main">
+            <button type="button" class="name-btn" (click)="rename(p)">{{ p.name }} ✎</button>
+            <label class="cal-pick">
+              <span class="muted small">Calendar</span>
+              <select
+                [disabled]="!status()?.connected"
+                [value]="p.calendarId ?? ''"
+                (change)="link(p, $any($event.target).value)"
+              >
+                <option value="">None (wall only)</option>
+                @for (c of calendarChoices(p); track c.id) {
+                  <option [value]="c.id" [selected]="c.id === p.calendarId">
+                    {{ c.name
+                    }}{{
+                      c.accessRole === 'reader' || c.accessRole === 'freeBusyReader'
+                        ? ' (view only)'
+                        : ''
+                    }}
+                  </option>
+                }
+                @if (p.calendarId && !calendarKnown(p.calendarId)) {
+                  <option [value]="p.calendarId" selected>Linked calendar</option>
+                }
+              </select>
+            </label>
+            <div class="palette">
+              @for (c of colors; track c) {
+                <button
+                  type="button"
+                  class="color"
+                  [class.selected]="c === p.color"
+                  [style.background]="c"
+                  [attr.aria-label]="'Color ' + c"
+                  (click)="recolor(p, c)"
+                ></button>
+              }
+            </div>
+          </div>
+          <button type="button" class="btn danger" (click)="remove(p)">
+            {{ confirmRemove() === p.id ? 'Tap again to remove' : 'Remove' }}
+          </button>
+        </div>
+      } @empty {
+        <p class="empty">No one yet. Add the family to get started.</p>
+      }
+    </div>
+
+    @if (unlinkedCalendars().length) {
+      <div class="unlinked">
+        <div class="muted small">Google calendars not on the wall yet:</div>
+        <div class="chips">
+          @for (c of unlinkedCalendars(); track c.id) {
+            <button type="button" class="btn" (click)="addFromCalendar(c)">+ {{ c.name }}</button>
+          }
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="card">
     <h2>On-screen keyboard</h2>
     <p class="muted small">
       Built-in works everywhere, including the Linux kiosk. Choose System on a tablet to use its own
@@ -34,7 +107,7 @@
       <p class="alert error">Google sign-in didn't finish. Please try again.</p>
     }
     @if (justConnected()) {
-      <p class="alert ok">Connected. Now add calendars below.</p>
+      <p class="alert ok">Connected. Now link calendars to people below.</p>
     }
 
     @if (status(); as s) {
@@ -75,63 +148,6 @@
       }
     }
   </section>
-
-  @if (status()?.connected) {
-    <section class="card">
-      <h2>Calendars</h2>
-      <p class="muted small">
-        Each calendar shared with the household account can be shown on the wall as a person.
-      </p>
-
-      <div class="cal-list">
-        @for (r of rows(); track r.cal.id) {
-          <div class="cal" [class.mapped]="r.person">
-            @if (r.person; as p) {
-              <span class="swatch" [style.background]="p.color"></span>
-              <div class="cal-main">
-                <input
-                  class="name"
-                  [value]="p.name"
-                  (keydown.enter)="$any($event.target).blur()"
-                  (blur)="rename(p, $any($event.target).value)"
-                />
-                <div class="muted small">
-                  {{ r.cal.name }}
-                  @if (r.cal.accessRole === 'reader' || r.cal.accessRole === 'freeBusyReader') {
-                    · <span class="warn">read-only: quick-add won't work</span>
-                  }
-                </div>
-                <div class="palette">
-                  @for (c of colors; track c) {
-                    <button
-                      type="button"
-                      class="color"
-                      [class.selected]="c === p.color"
-                      [style.background]="c"
-                      [attr.aria-label]="'Color ' + c"
-                      (click)="recolor(p, c)"
-                    ></button>
-                  }
-                </div>
-              </div>
-              <button type="button" class="btn danger" (click)="remove(p)">Remove</button>
-            } @else {
-              <span class="swatch hollow" [style.border-color]="r.cal.color"></span>
-              <div class="cal-main">
-                <div class="name">{{ r.cal.name }}</div>
-                <div class="muted small">{{ r.cal.id }}</div>
-              </div>
-              <button type="button" class="btn primary" (click)="addPerson(r.cal)">
-                Add to wall
-              </button>
-            }
-          </div>
-        } @empty {
-          <p class="empty">Loading calendars…</p>
-        }
-      </div>
-    </section>
-  }
 
   <section class="card">
     <h2>Diagnostics</h2>

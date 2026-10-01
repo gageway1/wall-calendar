@@ -4,6 +4,9 @@
       {{ clock.now() | date: 'h:mm' }}<span class="ampm">{{ clock.now() | date: 'a' }}</span>
     </div>
     <div class="date">{{ clock.now() | date: 'EEEE, MMMM d' }}</div>
+    @if (dinner(); as d) {
+      <a class="tonight" routerLink="/meals">🍽 Tonight: {{ d }}</a>
+    }
   </div>
 
   @if (current(); as w) {
@@ -61,8 +64,38 @@
   </section>
 
   <section class="card chores">
-    <h2>Chores</h2>
-    <p class="empty">No chores yet.</p>
+    <div class="chores-head">
+      <h2>Chores</h2>
+      @if (chores.today()?.items?.length) {
+        <span class="muted">{{ choresLeft() ? choresLeft() + ' left' : 'All done 🎉' }}</span>
+      }
+    </div>
+    @for (g of choreGroups(); track g.person.id) {
+      <div class="group" [style.--c]="g.person.color">
+        <div class="group-head">
+          <span class="dot"></span>
+          <span class="who">{{ g.person.name }}</span>
+          @if (g.streak) {
+            <span class="streak">🔥 {{ g.streak }}</span>
+          }
+        </div>
+        @for (item of g.items; track item.id) {
+          <button type="button" class="chore" [class.done]="item.done" (click)="toggle(item)">
+            <span class="check">
+              @if (item.done) {
+                ✓
+              }
+            </span>
+            <span class="chore-title">{{ item.title }}</span>
+            @if (item.overdue) {
+              <span class="overdue">overdue</span>
+            }
+          </button>
+        }
+      </div>
+    } @empty {
+      <p class="empty">No chores today. <a routerLink="/chores">Set some up</a></p>
+    }
   </section>
 
   <section class="card week">

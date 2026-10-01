@@ -1,0 +1,34 @@
+<header class="bar">
+  <div class="nav">
+    <button type="button" class="icon-btn" aria-label="Previous week" (click)="shift(-1)">
+      <app-icon name="left" />
+    </button>
+    <button type="button" class="btn" [disabled]="offset() === 0" (click)="offset.set(0)">
+      This week
+    </button>
+    <button type="button" class="icon-btn" aria-label="Next week" (click)="shift(1)">
+      <app-icon name="right" />
+    </button>
+    <h1>Dinners · {{ title() }}</h1>
+  </div>
+</header>
+
+<div class="days" appSwipe (swipeLeft)="shift(1)" (swipeRight)="shift(-1)">
+  @for (d of days(); track d.key) {
+    <button
+      type="button"
+      class="day card"
+      [class.today]="d.isToday"
+      [class.past]="d.isPast"
+      (click)="plan(d)"
+    >
+      <span class="dow">{{ d.dow }}</span>
+      <span class="num">{{ d.num }}</span>
+      @if (d.dinner) {
+        <span class="dinner">{{ d.dinner }}</span>
+      } @else {
+        <span class="dinner empty">+ Plan dinner</span>
+      }
+    </button>
+  }
+</div>

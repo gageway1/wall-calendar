@@ -1,0 +1,93 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 0.6);
+}
+
+.panel {
+  display: grid;
+  gap: 1rem;
+  width: min(56rem, 100%);
+  max-height: 100%;
+  overflow: auto;
+  padding: 1.5rem 2rem 2rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / 0.5);
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h2 {
+    margin: 0;
+    font-size: 1.6rem;
+  }
+}
+
+.close {
+  all: unset;
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.field {
+  all: unset;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  font-size: 1.6rem;
+  user-select: text;
+  caret-color: var(--accent);
+
+  &:focus {
+    outline: 2px solid var(--accent);
+  }
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.suggestion {
+  all: unset;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  cursor: pointer;
+
+  &:active {
+    filter: brightness(1.3);
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+
+  .btn {
+    padding: 0.9rem 2rem;
+    font-size: 1.1rem;
+  }
+
+  .clear {
+    margin-right: auto;
+  }
+}

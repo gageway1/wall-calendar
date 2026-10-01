@@ -30,7 +30,9 @@ npm run serve:prod     # http://localhost:4000
 2. Open **Settings → Connect Google account** via `localhost`. Google rejects LAN IPs as redirect
    URIs, so on the box use `ssh -L 4000:localhost:4000 <box>` from your PC.
 3. Share each person's calendar with the household account ("Make changes to events"), then
-   **Add to wall** in Settings.
+   link it to that person in **Settings → People**. People without a calendar (kids) are
+   wall-only: chores and streaks, no events. For kids' events, create a secondary calendar inside
+   the household account and link it.
 
 The server re-fetches 60 days back to 400 days ahead for each calendar every 90 s and replaces
 the local cache (`src/server/google/sync.ts`).
@@ -59,6 +61,6 @@ expose it to the internet.
 1. ✅ Skeleton: Home screen with clock and weather, SQLite schema
 2. ✅ Google Calendar sync: OAuth, calendar-to-person mapping, agenda/week/month views
 3. ✅ Quick-add on the wall: + button or tap a day, pick a person, type on the built-in keyboard, then set the start and length with steppers. Edit and delete from event details. Phones use the Google Calendar app.
-4. Chores, meal plan, grocery list
+4. ✅ Chores and dinners: people who don't need a Google account (kids), chores that repeat daily, on set weekdays, or once (carrying over until done), streaks, and a week of dinner plans
 5. Box: `setup.sh` (Ubuntu Server + cage + Chromium kiosk + systemd), dimming schedule
 6. Polish: touch targets, return to Home when idle, readability from across the room

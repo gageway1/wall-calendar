@@ -1,20 +1,23 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ChoresService } from '../core/chores.service';
 import { ClockService } from '../core/clock.service';
 import { addDays, dayKey, eventsForDay, formatTime, parseDay } from '../core/date';
 import { DialogService } from '../core/dialog.service';
 import { EventsService } from '../core/events.service';
-import { CalEvent } from '../core/models';
+import { CalEvent, ChoreItem, Meal } from '../core/models';
 import { PeopleService } from '../core/people.service';
 import { WeatherService, describeWeather } from '../core/weather.service';
 import { EventPill } from '../shared/event-pill';
+import { RouterLink } from '@angular/router';
 
 const WEEK_PILLS = 3;
 const fmtDow = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
 
 @Component({
   selector: 'app-home',
-  imports: [DatePipe, EventPill],
+  imports: [DatePipe, EventPill, RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -24,6 +27,47 @@ export class Home {
   protected readonly dialogs = inject(DialogService);
   protected readonly people = inject(PeopleService);
   protected readonly describe = describeWeather;
+  protected readonly chores = inject(ChoresService);
+  private readonly http = inject(HttpClient);
+
+  protected readonly dinner = signal<string | null>(null);
+
+  constructor() {
+    // Tonight's dinner, refreshed when the date flips.
+    effect((onCleanup) => {
+      const today = this.clock.today();
+      const sub = this.http
+        .get<Meal[]>('/api/meals', {
+          params: { from: today, to: dayKey(addDays(parseDay(today), 1)) },
+        })
+        .subscribe({ next: (m) => this.dinner.set(m[0]?.title ?? null), error: () => {} });
+      onCleanup(() => sub.unsubscribe());
+    });
+  }
+
+  /** Today's chores grouped by person, in people order; done ones sink to the bottom. */
+  protected readonly choreGroups = computed(() => {
+    const day = this.chores.today();
+    if (!day) return [];
+    return this.people
+      .people()
+      .map((p) => ({
+        person: p,
+        streak: day.streaks[p.id] ?? 0,
+        items: day.items
+          .filter((i) => i.personId === p.id)
+          .sort((a, b) => Number(a.done) - Number(b.done)),
+      }))
+      .filter((g) => g.items.length);
+  });
+
+  protected readonly choresLeft = computed(
+    () => this.chores.today()?.items.filter((i) => !i.done).length ?? 0,
+  );
+
+  protected toggle(item: ChoreItem) {
+    this.chores.toggle(item);
+  }
 
   private readonly events = inject(EventsService).watchRange(() => {
     const today = parseDay(this.clock.today());

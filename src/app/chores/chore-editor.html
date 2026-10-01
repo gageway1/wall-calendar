@@ -1,0 +1,115 @@
+<div class="backdrop" (click)="closed.emit()">
+  <div class="panel" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <header class="head">
+      <h2>{{ chore() ? 'Edit chore' : 'New chore' }}</h2>
+      <button type="button" class="close" aria-label="Close" (click)="closed.emit()">
+        <app-icon name="close" />
+      </button>
+    </header>
+
+    <div class="body">
+      <div class="left">
+        <section>
+          <div class="label">Who</div>
+          <div class="chips">
+            @for (p of people.people(); track p.id) {
+              <button
+                type="button"
+                class="chip"
+                [class.selected]="who() === p.id"
+                [style.--c]="p.color"
+                (click)="who.set(p.id)"
+              >
+                <span class="dot"></span>{{ p.name }}
+              </button>
+            }
+          </div>
+        </section>
+
+        <section>
+          <div class="label">What</div>
+          <input
+            class="title-input"
+            placeholder="Chore"
+            maxlength="120"
+            autocomplete="off"
+            [attr.inputmode]="keyboard.mode() === 'builtin' ? 'none' : null"
+            [attr.autofocus]="keyboard.mode() === 'system' ? '' : null"
+            [value]="title()"
+            (input)="title.set($any($event.target).value)"
+            (keydown.enter)="save()"
+          />
+        </section>
+
+        @if (keyboard.mode() === 'builtin') {
+          <app-osk [autoCap]="autoCap()" (key)="onKey($event)" />
+        }
+      </div>
+
+      <div class="right">
+        <section>
+          <div class="label">Repeat</div>
+          <div class="toggle">
+            <button type="button" [class.on]="kind() === 'daily'" (click)="kind.set('daily')">
+              Every day
+            </button>
+            <button type="button" [class.on]="kind() === 'weekly'" (click)="kind.set('weekly')">
+              Some days
+            </button>
+            <button type="button" [class.on]="kind() === 'once'" (click)="kind.set('once')">
+              One time
+            </button>
+          </div>
+
+          @if (kind() === 'weekly') {
+            <div class="weekdays">
+              @for (w of weekdays; track $index) {
+                <button
+                  type="button"
+                  class="wd"
+                  [class.on]="days().includes($index)"
+                  (click)="toggleDay($index)"
+                >
+                  {{ w }}
+                </button>
+              }
+            </div>
+            @if (!days().length) {
+              <div class="muted small">Pick at least one day.</div>
+            }
+          }
+
+          @if (kind() === 'once') {
+            <div class="date-row">
+              <button
+                type="button"
+                class="icon-btn"
+                aria-label="Previous day"
+                (click)="shiftDate(-1)"
+              >
+                <app-icon name="left" />
+              </button>
+              <div class="date">{{ dateLabel() }}</div>
+              <button type="button" class="icon-btn" aria-label="Next day" (click)="shiftDate(1)">
+                <app-icon name="right" />
+              </button>
+            </div>
+            <div class="muted small">Stays on the list until it's done.</div>
+          }
+        </section>
+
+        <div class="actions">
+          @if (chore()) {
+            <button type="button" class="btn danger remove" (click)="remove()">
+              {{ confirmDelete() ? 'Tap again to remove' : 'Remove' }}
+            </button>
+          }
+          <button type="button" class="btn" (click)="closed.emit()">Cancel</button>
+          <button type="button" class="btn primary" [disabled]="!canSave()" (click)="save()">
+            {{ saving() ? 'Saving…' : 'Save' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -94,6 +94,12 @@ const migrations: string[] = [
   -- Instance of a recurring series: edits/deletes from the wall touch this occurrence only.
   ALTER TABLE events ADD COLUMN recurring INTEGER NOT NULL DEFAULT 0;
   `,
+  `
+  -- Chores: first day they apply, the day they were removed (kept for streak history), order.
+  ALTER TABLE chores ADD COLUMN created_on TEXT NOT NULL DEFAULT '2000-01-01';
+  ALTER TABLE chores ADD COLUMN archived_on TEXT;
+  ALTER TABLE chores ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0;
+  `,
 ];
 
 function migrate(db: DatabaseSync) {

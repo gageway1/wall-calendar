@@ -1,0 +1,46 @@
+@if (prompts.current(); as p) {
+  <div class="backdrop" (click)="cancel()">
+    <div class="panel" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <header class="head">
+        <h2>{{ p.title }}</h2>
+        <button type="button" class="close" aria-label="Close" (click)="cancel()">
+          <app-icon name="close" />
+        </button>
+      </header>
+
+      <input
+        class="field"
+        autocomplete="off"
+        [placeholder]="p.placeholder ?? ''"
+        [attr.maxlength]="p.maxLength ?? 120"
+        [attr.inputmode]="keyboard.mode() === 'builtin' ? 'none' : null"
+        [attr.autofocus]="keyboard.mode() === 'system' ? '' : null"
+        [value]="value()"
+        (input)="value.set($any($event.target).value)"
+        (keydown.enter)="save()"
+      />
+
+      @if (suggestions().length) {
+        <div class="suggestions">
+          @for (s of suggestions(); track s) {
+            <button type="button" class="suggestion" (click)="value.set(s)">{{ s }}</button>
+          }
+        </div>
+      }
+
+      @if (keyboard.mode() === 'builtin') {
+        <app-osk [autoCap]="autoCap()" (key)="onKey($event)" />
+      }
+
+      <div class="actions">
+        @if (p.allowClear) {
+          <button type="button" class="btn danger clear" (click)="prompts.finish('')">Clear</button>
+        }
+        <button type="button" class="btn" (click)="cancel()">Cancel</button>
+        <button type="button" class="btn primary" [disabled]="!value().trim()" (click)="save()">
+          {{ p.confirm ?? 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

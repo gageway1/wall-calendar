@@ -189,3 +189,118 @@
 .small {
   font-size: 1rem;
 }
+
+.tonight {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 1.3rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+// Stays visible while a long chore list scrolls under it.
+.chores-head {
+  position: sticky;
+  top: -1.5rem;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: -1.5rem -1.5rem 0.25rem;
+  padding: 1.5rem 1.5rem 0.5rem;
+  background: var(--surface);
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.group {
+  margin-top: 0.75rem;
+}
+
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+
+  .dot {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: var(--c);
+  }
+
+  .who {
+    flex: 1;
+    font-weight: 600;
+    font-size: 1.15rem;
+  }
+}
+
+.streak {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+// Big targets: kids tap these.
+.chore {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.35rem 0.4rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+
+  &:active {
+    background: var(--surface-2);
+  }
+
+  .check {
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 3px var(--c);
+    color: var(--bg);
+    font-weight: 700;
+  }
+
+  .chore-title {
+    flex: 1;
+    min-width: 0;
+    font-size: 1.2rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &.done {
+    .check {
+      background: var(--c);
+    }
+
+    .chore-title {
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+  }
+}
+
+.overdue {
+  font-size: 0.85rem;
+  color: #ffa94d;
+}
+
+.empty a {
+  color: var(--accent);
+}

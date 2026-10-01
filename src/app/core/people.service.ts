@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { Person } from './models';
 
@@ -10,6 +10,8 @@ export class PeopleService {
   private readonly http = inject(HttpClient);
 
   readonly people = signal<Person[]>([]);
+  /** People with a Google calendar: the ones who can have events. */
+  readonly withCalendar = computed(() => this.people().filter((p) => p.calendarId !== null));
   /** People filtered out of the views. Remembered per browser. */
   readonly hidden = signal<ReadonlySet<number>>(loadHidden());
 
@@ -37,14 +39,26 @@ export class PeopleService {
   create(body: {
     name: string;
     color: string;
-    calendarId: string;
-    accessRole: string;
+    calendarId?: string | null;
+    accessRole?: string;
   }): Observable<Person> {
     return this.http.post<Person>('/api/people', body).pipe(tap(() => this.load()));
   }
 
-  update(id: number, body: Partial<Pick<Person, 'name' | 'color' | 'sortOrder'>>) {
+  /** `calendarId: null` unlinks; a string links that calendar. */
+  update(
+    id: number,
+    body: Partial<Pick<Person, 'name' | 'color' | 'sortOrder' | 'calendarId'>> & {
+      accessRole?: string;
+    },
+  ) {
     return this.http.patch<Person>(`/api/people/${id}`, body).pipe(tap(() => this.load()));
+  }
+
+  /** First palette color nobody uses yet. */
+  nextColor(palette: readonly string[]) {
+    const used = new Set(this.people().map((p) => p.color));
+    return palette.find((c) => !used.has(c)) ?? palette[this.people().length % palette.length];
   }
 
   remove(id: number) {

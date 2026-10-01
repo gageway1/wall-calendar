@@ -20,7 +20,10 @@ export const toPerson = (r: PersonRow) => ({
   color: r.color,
   calendarId: r.google_calendar_id,
   sortOrder: r.sort_order,
-  canWrite: r.access_role === null || r.access_role === 'writer' || r.access_role === 'owner',
+  /** Wall-only people (e.g. kids) have no calendar, so events can't be added for them. */
+  canWrite:
+    r.google_calendar_id !== null &&
+    (r.access_role === null || r.access_role === 'writer' || r.access_role === 'owner'),
 });
 
 const COLOR = /^#[0-9a-f]{6}$/i;
@@ -72,19 +75,46 @@ people.patch('/:id', (req, res) => {
     res.status(404).json({ error: 'not_found' });
     return;
   }
-  const { name, color, sortOrder } = req.body ?? {};
+  const { name, color, sortOrder, calendarId, accessRole } = req.body ?? {};
   if (color !== undefined && !COLOR.test(color)) {
     res.status(400).json({ error: 'color must be #rrggbb' });
     return;
   }
-  db()
-    .prepare('UPDATE people SET name = ?, color = ?, sort_order = ? WHERE id = ?')
-    .run(
+  // calendarId: string links a calendar, null unlinks, undefined leaves it alone.
+  const relink = calendarId !== undefined && calendarId !== person.google_calendar_id;
+  if (relink && calendarId !== null && typeof calendarId !== 'string') {
+    res.status(400).json({ error: 'calendarId must be a string or null' });
+    return;
+  }
+
+  const d = db();
+  d.exec('BEGIN');
+  try {
+    if (relink && person.google_calendar_id) {
+      d.prepare('DELETE FROM events WHERE calendar_id = ?').run(person.google_calendar_id);
+      d.prepare('DELETE FROM sync_state WHERE calendar_id = ?').run(person.google_calendar_id);
+    }
+    d.prepare(
+      'UPDATE people SET name = ?, color = ?, sort_order = ?, google_calendar_id = ?, access_role = ? WHERE id = ?',
+    ).run(
       typeof name === 'string' && name.trim() ? name.trim() : person.name,
       color ?? person.color,
       Number.isInteger(sortOrder) ? sortOrder : person.sort_order,
+      relink ? calendarId : person.google_calendar_id,
+      relink ? (typeof accessRole === 'string' ? accessRole : null) : person.access_role,
       person.id,
     );
+    d.exec('COMMIT');
+  } catch (err) {
+    d.exec('ROLLBACK');
+    throw err;
+  }
+
+  if (relink && calendarId) {
+    syncCalendar(calendarId).catch((err) =>
+      log('error', 'sync', `initial sync of ${calendarId} failed`, err),
+    );
+  }
   res.json(toPerson(getPerson(person.id)!));
 });
 

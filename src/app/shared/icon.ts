@@ -1,6 +1,7 @@
 import { Component, input } from '@angular/core';
 
-export type IconName = 'home' | 'week' | 'month' | 'settings' | 'left' | 'right' | 'close' | 'plus';
+export type IconName =
+  'home' | 'week' | 'month' | 'chores' | 'meals' | 'settings' | 'left' | 'right' | 'close' | 'plus';
 
 /** Tiny inline stroke icon set, so the kiosk needs no icon font or network. */
 @Component({
@@ -39,6 +40,13 @@ export type IconName = 'home' | 'week' | 'month' | 'settings' | 'left' | 'right'
         }
         @case ('plus') {
           <path d="M12 5v14M5 12h14" />
+        }
+        @case ('chores') {
+          <path d="M9 11l3 3 9-9" />
+          <path d="M20 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+        }
+        @case ('meals') {
+          <path d="M7 2v20M4 2v6a3 3 0 0 0 6 0V2M17 22V2c-2.5 1.5-3.5 4.5-3.5 8H17" />
         }
         @case ('close') {
           <path d="M18 6L6 18M6 6l12 12" />
