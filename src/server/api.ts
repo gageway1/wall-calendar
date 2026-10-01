@@ -1,8 +1,10 @@
 import express from 'express';
 import { NotConnectedError } from './google/oauth';
+import { log } from './logger';
 import { ensureSyncLoop } from './google/sync';
 import { events } from './routes/events';
 import { google } from './routes/google';
+import { logs } from './routes/logs';
 import { people } from './routes/people';
 import { getWeather } from './weather';
 
@@ -36,20 +38,20 @@ api.get('/weather', async (_req, res, next) => {
 api.use('/google', google);
 api.use('/people', people);
 api.use('/events', events);
+api.use('/logs', logs);
 
 api.use((_req, res) => {
   res.status(404).json({ error: 'not_found' });
 });
 
 api.use(
-  (err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  (err: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {
     if (err instanceof NotConnectedError) {
       res.status(409).json({ error: 'google_not_connected' });
       return;
     }
-    console.error('[api]', err);
-    res
-      .status(500)
-      .json({ error: 'internal', message: err instanceof Error ? err.message : String(err) });
+    // Details go to the log, never to the screen.
+    log('error', 'api', `${req.method} ${req.originalUrl} failed`, err);
+    res.status(500).json({ error: 'internal' });
   },
 );

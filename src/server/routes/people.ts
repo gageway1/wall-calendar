@@ -1,5 +1,6 @@
 import express from 'express';
 import { db } from '../db';
+import { log } from '../logger';
 import { syncCalendar } from '../google/sync';
 
 export const people = express.Router();
@@ -59,7 +60,7 @@ people.post('/', (req, res) => {
   // Pull the new calendar right away rather than waiting for the next sync tick.
   if (calendarId) {
     syncCalendar(calendarId).catch((err) =>
-      console.error('[sync] initial', calendarId, err.message),
+      log('error', 'sync', `initial sync of ${calendarId} failed`, err),
     );
   }
   res.status(201).json(toPerson(getPerson(Number(result.lastInsertRowid))!));

@@ -1,6 +1,7 @@
 import { db, getSetting, setSetting } from '../db';
 import { listCalendars, listEvents } from './calendar-api';
 import { EventRow, toEventRow } from './event-mapping';
+import { log } from '../logger';
 import { NotConnectedError, isConnected } from './oauth';
 
 const SYNC_INTERVAL_MS = 90 * 1000;
@@ -59,7 +60,7 @@ export async function syncAll() {
   } catch (err) {
     if (err instanceof NotConnectedError) throw err;
     failed++;
-    console.error('[sync] calendar list:', err instanceof Error ? err.message : err);
+    log('error', 'sync', 'calendar list refresh failed', err);
   }
   for (const { id } of calendars) {
     try {
@@ -67,7 +68,7 @@ export async function syncAll() {
     } catch (err) {
       if (err instanceof NotConnectedError) throw err;
       failed++;
-      console.error(`[sync] ${id}:`, err instanceof Error ? err.message : err);
+      log('error', 'sync', `calendar ${id} failed`, err);
     }
   }
 
@@ -95,7 +96,7 @@ export async function syncNow() {
   try {
     await syncAll();
   } catch (err) {
-    console.error('[sync]', err instanceof Error ? err.message : err);
+    log(err instanceof NotConnectedError ? 'warn' : 'error', 'sync', 'sync failed', err);
   } finally {
     running = false;
   }

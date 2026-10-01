@@ -1,0 +1,25 @@
+<div class="stack" aria-live="polite">
+  @for (t of toasts.visible(); track t.id) {
+    <div class="toast {{ t.kind }}" [class.leaving]="t.leaving" role="status">
+      <span class="badge" aria-hidden="true">
+        {{ t.kind === 'success' ? '✓' : t.kind === 'warn' ? '!' : '✕' }}
+      </span>
+      <span class="message">{{ t.message }}</span>
+      @if (t.count > 1) {
+        <span class="count">×{{ t.count }}</span>
+      }
+      <button type="button" class="close" aria-label="Dismiss" (click)="toasts.dismiss(t.id)">
+        <app-icon name="close" />
+      </button>
+      @if (t.duration) {
+        <!-- Re-created on each version so the countdown restarts when a duplicate arrives. -->
+        @for (v of [t.version]; track v) {
+          <span class="timer" [style.animation-duration.ms]="t.duration"></span>
+        }
+      }
+    </div>
+  }
+  @if (toasts.queued()) {
+    <div class="more">+{{ toasts.queued() }} more</div>
+  }
+</div>

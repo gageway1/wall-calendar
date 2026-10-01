@@ -129,9 +129,6 @@
         @if (editing()?.recurring) {
           <div class="muted small">Repeating event: changes apply to this day only.</div>
         }
-        @if (error(); as e) {
-          <div class="error">{{ e }}</div>
-        }
 
         <div class="actions">
           <button type="button" class="btn" (click)="close()">Cancel</button>

@@ -30,8 +30,8 @@
   <section class="card">
     <h2>Google account</h2>
 
-    @if (callbackError(); as err) {
-      <p class="alert error">Google sign-in failed: {{ err }}</p>
+    @if (callbackError()) {
+      <p class="alert error">Google sign-in didn't finish. Please try again.</p>
     }
     @if (justConnected()) {
       <p class="alert ok">Connected. Now add calendars below.</p>
@@ -132,4 +132,38 @@
       </div>
     </section>
   }
+
+  <section class="card">
+    <h2>Diagnostics</h2>
+    <p class="muted small">Try out notifications and error logging.</p>
+    <div class="diag">
+      <button type="button" class="btn" (click)="testSuccess()">Success toast</button>
+      <button type="button" class="btn" (click)="testWarn()">Warning toast</button>
+      <button type="button" class="btn" (click)="testError()">Error toast</button>
+      <button type="button" class="btn" (click)="testErrorRepeat()">Same error ×50</button>
+      <button type="button" class="btn" (click)="testErrorFlood()">40 different errors</button>
+      <button type="button" class="btn" (click)="toasts.clear()">Clear toasts</button>
+    </div>
+    <div class="diag">
+      <button type="button" class="btn primary" (click)="testLog()">Send test error to log</button>
+      <button type="button" class="btn" (click)="loadLogs()">Show recent errors</button>
+    </div>
+
+    @if (logs(); as l) {
+      <p class="muted small">
+        Log file: <code>{{ l.file }}</code>
+      </p>
+      <div class="log-list">
+        @for (e of l.entries; track $index) {
+          <div class="log" [class.warn]="e.level === 'warn'">
+            <span class="log-time">{{ formatTime(e.ts) }}</span>
+            <span class="log-source">{{ e.source }}</span>
+            <span class="log-msg">{{ e.message }}</span>
+          </div>
+        } @empty {
+          <p class="empty">No errors logged recently.</p>
+        }
+      </div>
+    }
+  </section>
 </div>

@@ -6,6 +6,7 @@ import { EventsService } from '../core/events.service';
 import { CalEvent } from '../core/models';
 import { PeopleService } from '../core/people.service';
 import { QuickAddService } from '../core/quick-add.service';
+import { ToastService } from '../core/toast.service';
 import { EventPill } from './event-pill';
 import { Icon } from './icon';
 
@@ -28,12 +29,12 @@ export class AppDialog {
   private readonly events = inject(EventsService);
   private readonly people = inject(PeopleService);
   private readonly quickAdd = inject(QuickAddService);
+  private readonly toasts = inject(ToastService);
   protected readonly dialogs = inject(DialogService);
   protected readonly describeWhen = describeWhen;
 
   protected readonly confirmDelete = signal(false);
   protected readonly deleting = signal(false);
-  protected readonly error = signal<string | null>(null);
 
   constructor() {
     // Fresh state whenever the dialog opens on something else.
@@ -41,7 +42,6 @@ export class AppDialog {
       this.dialogs.state();
       this.confirmDelete.set(false);
       this.deleting.set(false);
-      this.error.set(null);
     });
   }
 
@@ -71,13 +71,13 @@ export class AppDialog {
     const url = `/api/events/${encodeURIComponent(event.calendarId)}/${encodeURIComponent(event.eventId)}`;
     this.http.delete(url).subscribe({
       next: () => {
+        this.toasts.success('Event deleted');
         this.events.refresh();
         this.dialogs.close();
       },
       error: () => {
         this.deleting.set(false);
         this.confirmDelete.set(false);
-        this.error.set('Could not delete. Try again.');
       },
     });
   }

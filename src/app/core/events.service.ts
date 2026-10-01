@@ -40,7 +40,8 @@ export class EventsService implements OnDestroy {
 
       const sub = this.http.get<CalEvent[]>('/api/events', { params: r }).subscribe({
         next: (events) => raw.set(events),
-        error: (err) => console.warn('[events] refresh failed', err.status),
+        // Failures are surfaced by the HTTP interceptor; keep showing what we have.
+        error: () => {},
       });
       onCleanup(() => sub.unsubscribe());
     });

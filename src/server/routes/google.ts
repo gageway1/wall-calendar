@@ -1,5 +1,6 @@
 import express from 'express';
 import { getSetting } from '../db';
+import { log } from '../logger';
 import { listCalendars } from '../google/calendar-api';
 import { buildAuthUrl, completeAuth, disconnect, isConfigured, isConnected } from '../google/oauth';
 import { refreshAccountInfo, syncNow } from '../google/sync';
@@ -43,9 +44,8 @@ google.get('/callback', async (req, res) => {
     void syncNow();
     res.redirect('/settings?google=connected');
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error('[google] callback failed:', message);
-    res.redirect(`/settings?google_error=${encodeURIComponent(message)}`);
+    log('error', 'google', 'sign-in callback failed', err);
+    res.redirect('/settings?google_error=1');
   }
 });
 

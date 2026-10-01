@@ -18,7 +18,11 @@ export class PeopleService {
   }
 
   load() {
-    this.http.get<Person[]>('/api/people').subscribe((p) => this.people.set(p));
+    this.http.get<Person[]>('/api/people').subscribe({
+      next: (p) => this.people.set(p),
+      // Surfaced by the HTTP interceptor; keep the last list.
+      error: () => {},
+    });
   }
 
   toggle(id: number) {

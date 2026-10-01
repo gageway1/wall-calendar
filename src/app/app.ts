@@ -7,9 +7,10 @@ import { QuickAddService } from './core/quick-add.service';
 import { QuickAdd } from './quick-add/quick-add';
 import { AppDialog } from './shared/app-dialog';
 import { Icon, IconName } from './shared/icon';
+import { Toasts } from './shared/toasts';
 
 @Component({
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon, AppDialog, QuickAdd],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon, AppDialog, QuickAdd, Toasts],
   selector: 'app-root',
   styleUrl: './app.scss',
   templateUrl: './app.html',

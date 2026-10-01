@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { ClockService } from '../core/clock.service';
 import {
@@ -15,6 +15,7 @@ import { KeyboardService } from '../core/keyboard.service';
 import { CalEvent, TitleSuggestion } from '../core/models';
 import { PeopleService } from '../core/people.service';
 import { QuickAddRequest, QuickAddService } from '../core/quick-add.service';
+import { ToastService } from '../core/toast.service';
 import { Icon } from '../shared/icon';
 import { Osk, OskKey } from '../shared/osk';
 
@@ -44,6 +45,7 @@ export class QuickAdd implements OnInit {
   private readonly clock = inject(ClockService);
   private readonly events = inject(EventsService);
   private readonly quickAdd = inject(QuickAddService);
+  private readonly toasts = inject(ToastService);
   protected readonly people = inject(PeopleService);
   protected readonly keyboard = inject(KeyboardService);
 
@@ -62,7 +64,6 @@ export class QuickAdd implements OnInit {
   protected readonly days = signal(1);
 
   protected readonly saving = signal(false);
-  protected readonly error = signal<string | null>(null);
   private readonly suggestions = signal<TitleSuggestion[]>([]);
 
   protected readonly formatMinutes = formatMinutes;
@@ -197,16 +198,14 @@ export class QuickAdd implements OnInit {
       : this.http.post('/api/events', body);
 
     this.saving.set(true);
-    this.error.set(null);
     req.subscribe({
       next: () => {
+        this.toasts.success(ev ? 'Event updated' : 'Event added');
         this.events.refresh();
         this.close();
       },
-      error: (err: HttpErrorResponse) => {
-        this.saving.set(false);
-        this.error.set(err.error?.error ?? err.error?.message ?? "Couldn't save. Try again.");
-      },
+      // The interceptor shows the error toast; stay open so nothing typed is lost.
+      error: () => this.saving.set(false),
     });
   }
 

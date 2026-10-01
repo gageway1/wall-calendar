@@ -1,6 +1,6 @@
 import type { DatabaseSync } from 'node:sqlite';
-import { mkdirSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
+import { dataDir } from './paths';
 
 // Loaded at runtime: esbuild rewrites `node:sqlite` to the nonexistent bare `sqlite`.
 const { DatabaseSync: Database } = process.getBuiltinModule(
@@ -12,9 +12,7 @@ let instance: DatabaseSync | undefined;
 /** Opened lazily so the Angular build (which imports server.ts to extract routes) never touches disk. */
 export function db(): DatabaseSync {
   if (!instance) {
-    const dataDir = resolve(process.env['DATA_DIR'] ?? 'data');
-    mkdirSync(dataDir, { recursive: true });
-    instance = new Database(join(dataDir, 'wall.db'));
+    instance = new Database(join(dataDir(), 'wall.db'));
     instance.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
     migrate(instance);
   }

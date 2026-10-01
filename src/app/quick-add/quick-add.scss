@@ -228,12 +228,6 @@
   font-size: 0.9rem;
 }
 
-.error {
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, #ff6b6b 20%, var(--surface));
-}
-
 .actions {
   display: flex;
   justify-content: flex-end;
