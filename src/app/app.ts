@@ -4,6 +4,7 @@ import { QuickAddService } from './core/quick-add.service';
 import { QuickAdd } from './quick-add/quick-add';
 import { AppDialog } from './shared/app-dialog';
 import { Icon, IconName } from './shared/icon';
+import { PinPad } from './shared/pin-pad';
 import { TextPrompt } from './shared/text-prompt';
 import { Toasts } from './shared/toasts';
 
@@ -17,6 +18,7 @@ import { Toasts } from './shared/toasts';
     QuickAdd,
     Toasts,
     TextPrompt,
+    PinPad,
   ],
   selector: 'app-root',
   styleUrl: './app.scss',

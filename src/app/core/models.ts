@@ -8,6 +8,8 @@ export interface Person {
   canWrite: boolean;
   /** Off for shared calendars like holidays or "Family". */
   hasChores: boolean;
+  /** Adding/editing/removing this person's chores needs the parent PIN (kids). */
+  choresLocked: boolean;
 }
 
 export interface CalEvent {

@@ -37,6 +37,14 @@ npm run serve:prod     # http://localhost:4000
 The server re-fetches 60 days back to 400 days ahead for each calendar every 90 s and replaces
 the local cache (`src/server/google/sync.ts`).
 
+## Parent PIN
+
+A 4–8 digit PIN (Settings → Parent PIN) is asked for every time Settings opens, and before
+adding, editing or removing chores for anyone with "Chore changes need PIN" switched on (on by
+default for wall-only people, i.e. kids). Checking chores off never needs it. It's a speed bump
+for kids, not security: the check is client-side, and five wrong tries locks the pad for 30 s.
+Forgot it? Remove it from the box: `sqlite3 data/wall.db "UPDATE settings SET value='' WHERE key LIKE 'pin.%'"`.
+
 ## Errors and logs
 
 - People only ever see friendly toasts. Errors read "Oops! Something went wrong." and stay until

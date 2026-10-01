@@ -9,6 +9,7 @@ import { google } from './routes/google';
 import { logs } from './routes/logs';
 import { meals } from './routes/meals';
 import { people } from './routes/people';
+import { pin } from './routes/pin';
 import { getWeather } from './weather';
 
 export const api = express.Router();
@@ -44,6 +45,7 @@ api.use('/events', events);
 api.use('/logs', logs);
 api.use('/chores', chores);
 api.use('/meals', meals);
+api.use('/pin', pin);
 
 api.use((_req, res) => {
   res.status(404).json({ error: 'not_found' });

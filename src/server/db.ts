@@ -105,6 +105,11 @@ const migrations: string[] = [
   ALTER TABLE people ADD COLUMN has_chores INTEGER NOT NULL DEFAULT 1;
   UPDATE people SET has_chores = 0 WHERE access_role IN ('reader', 'freeBusyReader');
   `,
+  `
+  -- Kids' chore lists can only be changed with the parent PIN (checking off is always allowed).
+  ALTER TABLE people ADD COLUMN chores_locked INTEGER NOT NULL DEFAULT 0;
+  UPDATE people SET chores_locked = 1 WHERE google_calendar_id IS NULL;
+  `,
 ];
 
 function migrate(db: DatabaseSync) {

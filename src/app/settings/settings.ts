@@ -7,6 +7,7 @@ import { reportError } from '../core/error-reporting';
 import { KeyboardService } from '../core/keyboard.service';
 import { GoogleCalendar, GoogleStatus, PERSON_COLORS, Person } from '../core/models';
 import { PeopleService } from '../core/people.service';
+import { PinService } from '../core/pin.service';
 import { TextPromptService } from '../core/text-prompt.service';
 import { GENERIC_ERROR, ToastService } from '../core/toast.service';
 
@@ -30,6 +31,8 @@ export class Settings {
   protected readonly keyboard = inject(KeyboardService);
   protected readonly toasts = inject(ToastService);
   private readonly prompt = inject(TextPromptService);
+  protected readonly pin = inject(PinService);
+  protected readonly confirmRemovePin = signal(false);
 
   private readonly query = toSignal(inject(ActivatedRoute).queryParamMap);
   protected readonly callbackError = computed(() => !!this.query()?.get('google_error'));
@@ -50,6 +53,7 @@ export class Settings {
   protected readonly confirmRemove = signal<number | null>(null);
 
   constructor() {
+    void this.pin.load();
     this.loadStatus();
   }
 
@@ -151,6 +155,29 @@ export class Settings {
         this.toasts.success(cal ? `Linked ${cal.name}` : `${p.name} is wall-only now`);
         setTimeout(() => this.events.refresh(), cal ? 3000 : 0);
       });
+  }
+
+  protected async setPin() {
+    const wasSet = !!this.pin.status()?.set;
+    if (await this.pin.create()) this.toasts.success(wasSet ? 'PIN changed' : 'PIN set');
+  }
+
+  protected async removePin() {
+    if (!this.confirmRemovePin()) {
+      this.confirmRemovePin.set(true);
+      return;
+    }
+    this.confirmRemovePin.set(false);
+    await this.pin.remove();
+    this.toasts.success('PIN removed');
+  }
+
+  protected toggleLock(p: Person) {
+    this.peopleSvc.update(p.id, { choresLocked: !p.choresLocked }).subscribe(() => {
+      this.toasts.success(
+        p.choresLocked ? `Anyone can change ${p.name}'s chores` : `${p.name}'s chores need the PIN`,
+      );
+    });
   }
 
   protected toggleChores(p: Person) {

@@ -5,6 +5,7 @@ import { addDays, dayKey, daysBetween, parseDay } from '../core/date';
 import { KeyboardService } from '../core/keyboard.service';
 import { Chore, Recurrence } from '../core/models';
 import { PeopleService } from '../core/people.service';
+import { PinService } from '../core/pin.service';
 import { ToastService } from '../core/toast.service';
 import { Icon } from '../shared/icon';
 import { Osk, OskKey } from '../shared/osk';
@@ -28,6 +29,7 @@ export class ChoreEditor implements OnInit {
   private readonly chores = inject(ChoresService);
   private readonly clock = inject(ClockService);
   private readonly toasts = inject(ToastService);
+  private readonly pin = inject(PinService);
   protected readonly people = inject(PeopleService);
   protected readonly keyboard = inject(KeyboardService);
 
@@ -35,6 +37,8 @@ export class ChoreEditor implements OnInit {
   readonly chore = input<Chore | null>(null);
   /** Preselected person for a new chore. */
   readonly personId = input<number | null>(null);
+  /** The PIN was already entered to open this editor. */
+  readonly unlocked = input(false);
   readonly closed = output<void>();
 
   protected readonly weekdays = WEEKDAYS;
@@ -96,10 +100,15 @@ export class ChoreEditor implements OnInit {
     this.date.set(dayKey(addDays(parseDay(this.date()), n)));
   }
 
-  protected save() {
+  protected async save() {
     const who = this.who();
     const recurrence = this.recurrence();
     if (!this.canSave() || who === null || !recurrence) return;
+
+    const target = this.people.people().find((p) => p.id === who);
+    if (target?.choresLocked && !this.unlocked()) {
+      if (!(await this.pin.require(`PIN to give ${target.name} a chore`))) return;
+    }
 
     const body: ChoreInput = { personId: who, title: this.title().trim(), recurrence };
     const existing = this.chore();

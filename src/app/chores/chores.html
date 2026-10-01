@@ -32,11 +32,7 @@
               } @else {
                 <span class="check off" title="Not due today"></span>
               }
-              <button
-                type="button"
-                class="chore"
-                (click)="editing.set({ chore: row.chore, personId: null })"
-              >
+              <button type="button" class="chore" (click)="open(row.chore, row.chore.personId)">
                 <span class="title" [class.done]="row.today?.done">{{ row.chore.title }}</span>
                 <span class="when" [class.overdue]="row.today?.overdue">
                   {{ row.today?.overdue ? 'Overdue · ' : '' }}{{ describe(row.chore.recurrence) }}
@@ -48,11 +44,7 @@
           }
         </div>
 
-        <button
-          type="button"
-          class="btn add"
-          (click)="editing.set({ chore: null, personId: col.person.id })"
-        >
+        <button type="button" class="btn add" (click)="open(null, col.person.id)">
           + Add chore
         </button>
       </section>
@@ -65,5 +57,10 @@
 }
 
 @if (editing(); as e) {
-  <app-chore-editor [chore]="e.chore" [personId]="e.personId" (closed)="editing.set(null)" />
+  <app-chore-editor
+    [chore]="e.chore"
+    [personId]="e.personId"
+    [unlocked]="e.unlocked"
+    (closed)="editing.set(null)"
+  />
 }

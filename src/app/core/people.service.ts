@@ -50,7 +50,9 @@ export class PeopleService {
   /** `calendarId: null` unlinks; a string links that calendar. */
   update(
     id: number,
-    body: Partial<Pick<Person, 'name' | 'color' | 'sortOrder' | 'calendarId' | 'hasChores'>> & {
+    body: Partial<
+      Pick<Person, 'name' | 'color' | 'sortOrder' | 'calendarId' | 'hasChores' | 'choresLocked'>
+    > & {
       accessRole?: string;
     },
   ) {

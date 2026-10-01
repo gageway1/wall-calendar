@@ -1,0 +1,44 @@
+@if (pins.request(); as r) {
+  <div class="backdrop" (click)="pins.cancel()">
+    <div class="panel" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <h2>{{ heading() }}</h2>
+
+      <div class="dots" [class.shake]="shake()">
+        @for (filled of dots(); track $index) {
+          <span class="dot" [class.filled]="filled"></span>
+        }
+      </div>
+
+      <div class="message" [class.locked]="lockedFor()">
+        @if (lockedFor()) {
+          Too many tries. Wait {{ lockedFor() }}s.
+        } @else {
+          {{ message() ?? (r.mode === 'create' ? '4 to 8 digits' : ' ') }}
+        }
+      </div>
+
+      <div class="pad" [class.disabled]="lockedFor()">
+        @for (k of keys; track k) {
+          <button type="button" class="key" (click)="press(k)">{{ k }}</button>
+        }
+        <button type="button" class="key aux" aria-label="Delete" (click)="backspace()">⌫</button>
+        <button type="button" class="key" (click)="press('0')">0</button>
+        @if (r.mode === 'create') {
+          <button
+            type="button"
+            class="key aux ok"
+            aria-label="OK"
+            [disabled]="!canConfirm()"
+            (click)="confirm()"
+          >
+            ✓
+          </button>
+        } @else {
+          <span></span>
+        }
+      </div>
+
+      <button type="button" class="btn cancel" (click)="pins.cancel()">Cancel</button>
+    </div>
+  </div>
+}

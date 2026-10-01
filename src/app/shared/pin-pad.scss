@@ -1,0 +1,115 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 0.7);
+}
+
+.panel {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding: 2rem 2.5rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / 0.5);
+
+  h2 {
+    margin: 0;
+    font-size: 1.6rem;
+  }
+}
+
+.dots {
+  display: flex;
+  gap: 1rem;
+  min-height: 1.4rem;
+
+  &.shake {
+    animation: shake 0.35s;
+  }
+}
+
+.dot {
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--text-muted);
+
+  &.filled {
+    background: var(--text);
+    box-shadow: none;
+  }
+}
+
+.message {
+  min-height: 1.4rem;
+  color: #ff8787;
+
+  &.locked {
+    color: #ffa94d;
+  }
+}
+
+// ~15mm keys on the target panel.
+.pad {
+  display: grid;
+  grid-template-columns: repeat(3, 5.5rem);
+  gap: 0.9rem;
+
+  &.disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+}
+
+.key {
+  all: unset;
+  height: 5.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-2);
+  font-size: 2rem;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:active {
+    background: color-mix(in srgb, var(--accent) 35%, var(--surface-2));
+  }
+
+  &.aux {
+    background: transparent;
+    font-size: 1.6rem;
+    color: var(--text-muted);
+  }
+
+  &.ok {
+    background: var(--accent);
+    color: var(--bg);
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+  }
+}
+
+.cancel {
+  margin-top: 0.5rem;
+  padding: 0.8rem 2.5rem;
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(-0.6rem);
+  }
+  40%,
+  80% {
+    transform: translateX(0.6rem);
+  }
+}

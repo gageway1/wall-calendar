@@ -4,6 +4,26 @@
 
 <div class="scroll">
   <section class="card">
+    <h2>Parent PIN</h2>
+    @if (pin.status(); as ps) {
+      @if (ps.set) {
+        <p class="muted small">
+          Needed to open Settings and to change chores for anyone marked "Chore changes need PIN".
+        </p>
+        <div class="actions">
+          <button type="button" class="btn" (click)="setPin()">Change PIN</button>
+          <button type="button" class="btn danger" (click)="removePin()">
+            {{ confirmRemovePin() ? 'Tap again to remove' : 'Remove PIN' }}
+          </button>
+        </div>
+      } @else {
+        <p class="alert error">No PIN yet: anyone can open Settings and change the kids' chores.</p>
+        <button type="button" class="btn primary" (click)="setPin()">Set a PIN</button>
+      }
+    }
+  </section>
+
+  <section class="card">
     <div class="card-head">
       <h2>People</h2>
       <button type="button" class="btn primary" (click)="addPerson()">+ Add person</button>
@@ -56,6 +76,24 @@
               </button>
               <span class="small">{{ p.hasChores ? 'On' : 'Off (shared calendar)' }}</span>
             </div>
+            @if (p.hasChores) {
+              <div class="chores-toggle">
+                <span class="muted small">Chore changes need PIN</span>
+                <button
+                  type="button"
+                  class="switch"
+                  role="switch"
+                  [class.on]="p.choresLocked"
+                  [attr.aria-checked]="p.choresLocked"
+                  (click)="toggleLock(p)"
+                >
+                  <span class="knob"></span>
+                </button>
+                <span class="small">
+                  {{ p.choresLocked ? 'Yes: can only check them off' : 'No' }}
+                </span>
+              </div>
+            }
             <div class="palette">
               @for (c of colors; track c) {
                 <button
