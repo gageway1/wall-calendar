@@ -51,8 +51,7 @@ export class Osk implements OnDestroy {
     this.shift.update((s) => !s);
   }
 
-  protected done(e: PointerEvent) {
-    e.preventDefault();
+  protected done() {
     this.key.emit({ type: 'done' });
   }
 

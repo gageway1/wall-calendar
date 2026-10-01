@@ -9,6 +9,7 @@
       </header>
 
       <input
+        #field
         class="field"
         autocomplete="off"
         [placeholder]="p.placeholder ?? ''"
@@ -17,7 +18,7 @@
         [attr.autofocus]="keyboard.mode() === 'system' ? '' : null"
         [value]="value()"
         (input)="value.set($any($event.target).value)"
-        (keydown.enter)="save()"
+        (keydown.enter)="$event.preventDefault(); save()"
       />
 
       @if (suggestions().length) {

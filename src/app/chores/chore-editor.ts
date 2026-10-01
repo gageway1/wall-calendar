@@ -1,4 +1,15 @@
-import { Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+  ElementRef,
+  effect,
+  viewChild,
+} from '@angular/core';
 import { ChoreInput, ChoresService } from '../core/chores.service';
 import { ClockService } from '../core/clock.service';
 import { addDays, dayKey, daysBetween, parseDay } from '../core/date';
@@ -26,6 +37,10 @@ const fmtDate = new Intl.DateTimeFormat(undefined, {
   host: { '(document:keydown.escape)': 'closed.emit()' },
 })
 export class ChoreEditor implements OnInit {
+  /** Focused on open: physical-keyboard typing and Enter go to the field. */
+  private readonly field = viewChild<ElementRef<HTMLInputElement>>('field');
+  private readonly focusField = effect(() => this.field()?.nativeElement.focus());
+
   private readonly chores = inject(ChoresService);
   private readonly clock = inject(ClockService);
   private readonly toasts = inject(ToastService);

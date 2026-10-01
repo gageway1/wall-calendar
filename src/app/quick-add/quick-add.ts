@@ -1,5 +1,15 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  inject,
+  input,
+  signal,
+  ElementRef,
+  effect,
+  viewChild,
+} from '@angular/core';
 import { ClockService } from '../core/clock.service';
 import {
   addDays,
@@ -41,6 +51,10 @@ const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v
   host: { '(document:keydown.escape)': 'close()' },
 })
 export class QuickAdd implements OnInit {
+  /** Focused on open: physical-keyboard typing and Enter go to the field. */
+  private readonly field = viewChild<ElementRef<HTMLInputElement>>('field');
+  private readonly focusField = effect(() => this.field()?.nativeElement.focus());
+
   private readonly http = inject(HttpClient);
   private readonly clock = inject(ClockService);
   private readonly events = inject(EventsService);

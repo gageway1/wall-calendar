@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, ElementRef, viewChild } from '@angular/core';
 import { KeyboardService } from '../core/keyboard.service';
 import { TextPromptService } from '../core/text-prompt.service';
 import { Icon } from './icon';
@@ -14,6 +14,10 @@ const MAX_SUGGESTIONS = 10;
   host: { '(document:keydown.escape)': 'cancel()' },
 })
 export class TextPrompt {
+  /** Focused on open: physical-keyboard typing and Enter go to the field. */
+  private readonly field = viewChild<ElementRef<HTMLInputElement>>('field');
+  private readonly focusField = effect(() => this.field()?.nativeElement.focus());
+
   protected readonly prompts = inject(TextPromptService);
   protected readonly keyboard = inject(KeyboardService);
   protected readonly value = signal('');

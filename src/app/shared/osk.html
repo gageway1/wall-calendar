@@ -33,5 +33,14 @@
   <button type="button" class="key" (pointerdown)="press($event, '&')">&amp;</button>
   <button type="button" class="key space" (pointerdown)="space($event)">space</button>
   <button type="button" class="key" (pointerdown)="press($event, '?')">?</button>
-  <button type="button" class="key wide done" (pointerdown)="done($event)">Done</button>
+  <!-- On click, not pointerdown: Done closes the popup, and acting on touch-down let the
+       following click land on whatever was underneath (e.g. another day card). -->
+  <button
+    type="button"
+    class="key wide done"
+    (pointerdown)="$event.preventDefault()"
+    (click)="done()"
+  >
+    Done
+  </button>
 </div>

@@ -77,7 +77,6 @@ export class Lists implements OnDestroy {
     } catch {}
   }
 
-  /** Keeps asking so a whole grocery run can be typed in one go; Cancel ends it. */
   protected async add() {
     const list = this.selected();
     if (!list) return;
@@ -85,26 +84,19 @@ export class Lists implements OnDestroy {
       this.http.get<string[]>(`/api/lists/${enc(list.id)}/suggestions`),
     ).catch(() => [] as string[]);
 
-    for (;;) {
-      const onList = new Set(this.open().map((i) => i.title.toLowerCase()));
-      const title = await this.prompt.ask({
-        title: `Add to ${list.title}`,
-        placeholder: 'Item',
-        suggestions: suggestions.filter((s) => !onList.has(s.toLowerCase())),
-        confirm: 'Add',
-        maxLength: 200,
-      });
-      if (!title) return;
-      try {
-        const item = await firstValueFrom(
-          this.http.post<Item>(`/api/lists/${enc(list.id)}/items`, { title }),
-        );
-        this.items.update((items) => [item, ...items]);
-        this.toasts.success(`Added ${title}`);
-      } catch {
-        return; // The interceptor already showed the error.
-      }
-    }
+    const onList = new Set(this.open().map((i) => i.title.toLowerCase()));
+    const title = await this.prompt.ask({
+      title: `Add to ${list.title}`,
+      placeholder: 'Item',
+      suggestions: suggestions.filter((s) => !onList.has(s.toLowerCase())),
+      confirm: 'Add',
+      maxLength: 200,
+    });
+    if (!title) return;
+    this.http.post<Item>(`/api/lists/${enc(list.id)}/items`, { title }).subscribe((item) => {
+      this.items.update((items) => [item, ...items]);
+      this.toasts.success(`Added ${title}`);
+    });
   }
 
   protected toggle(item: Item) {
