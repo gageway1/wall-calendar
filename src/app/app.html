@@ -17,7 +17,9 @@
 </main>
 
 @if (showAdd() && !quickAdd.request() && !dialogs.state()) {
-  <button type="button" class="fab" aria-label="Add event" (click)="quickAdd.open()">+</button>
+  <button type="button" class="fab" aria-label="Add event" (click)="quickAdd.open()">
+    <app-icon name="plus" />
+  </button>
 }
 
 <app-dialog />
