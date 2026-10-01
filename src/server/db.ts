@@ -100,6 +100,11 @@ const migrations: string[] = [
   ALTER TABLE chores ADD COLUMN archived_on TEXT;
   ALTER TABLE chores ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0;
   `,
+  `
+  -- Shared calendars (holidays, "Family") aren't people with chores.
+  ALTER TABLE people ADD COLUMN has_chores INTEGER NOT NULL DEFAULT 1;
+  UPDATE people SET has_chores = 0 WHERE access_role IN ('reader', 'freeBusyReader');
+  `,
 ];
 
 function migrate(db: DatabaseSync) {

@@ -50,7 +50,7 @@ export class Home {
     const day = this.chores.today();
     if (!day) return [];
     return this.people
-      .people()
+      .withChores()
       .map((p) => ({
         person: p,
         streak: day.streaks[p.id] ?? 0,

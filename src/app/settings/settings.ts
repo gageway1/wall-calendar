@@ -153,6 +153,12 @@ export class Settings {
       });
   }
 
+  protected toggleChores(p: Person) {
+    this.peopleSvc.update(p.id, { hasChores: !p.hasChores }).subscribe(() => {
+      this.toasts.success(p.hasChores ? `Chores off for ${p.name}` : `Chores on for ${p.name}`);
+    });
+  }
+
   protected recolor(p: Person, color: string) {
     this.peopleSvc.update(p.id, { color }).subscribe(() => {
       this.toasts.success('Color saved');

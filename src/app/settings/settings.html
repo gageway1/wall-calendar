@@ -42,6 +42,20 @@
                 }
               </select>
             </label>
+            <div class="chores-toggle">
+              <span class="muted small">Chores</span>
+              <button
+                type="button"
+                class="switch"
+                role="switch"
+                [class.on]="p.hasChores"
+                [attr.aria-checked]="p.hasChores"
+                (click)="toggleChores(p)"
+              >
+                <span class="knob"></span>
+              </button>
+              <span class="small">{{ p.hasChores ? 'On' : 'Off (shared calendar)' }}</span>
+            </div>
             <div class="palette">
               @for (c of colors; track c) {
                 <button

@@ -24,7 +24,7 @@ export class Chores {
   protected readonly columns = computed(() => {
     const today = this.chores.today();
     const todayById = new Map(today?.items.map((i) => [i.id, i]) ?? []);
-    return this.people.people().map((p) => ({
+    return this.people.withChores().map((p) => ({
       person: p,
       streak: today?.streaks[p.id] ?? 0,
       chores: this.chores

@@ -6,6 +6,8 @@ export interface Person {
   sortOrder: number;
   /** False when the calendar is shared view-only with the household account. */
   canWrite: boolean;
+  /** Off for shared calendars like holidays or "Family". */
+  hasChores: boolean;
 }
 
 export interface CalEvent {

@@ -12,6 +12,7 @@ interface PersonRow {
   google_calendar_id: string | null;
   sort_order: number;
   access_role: string | null;
+  has_chores: number;
 }
 
 export const toPerson = (r: PersonRow) => ({
@@ -20,6 +21,7 @@ export const toPerson = (r: PersonRow) => ({
   color: r.color,
   calendarId: r.google_calendar_id,
   sortOrder: r.sort_order,
+  hasChores: r.has_chores === 1,
   /** Wall-only people (e.g. kids) have no calendar, so events can't be added for them. */
   canWrite:
     r.google_calendar_id !== null &&
@@ -50,7 +52,7 @@ people.post('/', (req, res) => {
   };
   const result = db()
     .prepare(
-      'INSERT INTO people (name, color, google_calendar_id, sort_order, access_role) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO people (name, color, google_calendar_id, sort_order, access_role, has_chores) VALUES (?, ?, ?, ?, ?, ?)',
     )
     .run(
       name.trim(),
@@ -58,6 +60,8 @@ people.post('/', (req, res) => {
       typeof calendarId === 'string' ? calendarId : null,
       next.n,
       typeof accessRole === 'string' ? accessRole : null,
+      // View-only calendars (holidays and the like) start without chores.
+      accessRole === 'reader' || accessRole === 'freeBusyReader' ? 0 : 1,
     );
 
   // Pull the new calendar right away rather than waiting for the next sync tick.
@@ -75,7 +79,7 @@ people.patch('/:id', (req, res) => {
     res.status(404).json({ error: 'not_found' });
     return;
   }
-  const { name, color, sortOrder, calendarId, accessRole } = req.body ?? {};
+  const { name, color, sortOrder, calendarId, accessRole, hasChores } = req.body ?? {};
   if (color !== undefined && !COLOR.test(color)) {
     res.status(400).json({ error: 'color must be #rrggbb' });
     return;
@@ -95,13 +99,14 @@ people.patch('/:id', (req, res) => {
       d.prepare('DELETE FROM sync_state WHERE calendar_id = ?').run(person.google_calendar_id);
     }
     d.prepare(
-      'UPDATE people SET name = ?, color = ?, sort_order = ?, google_calendar_id = ?, access_role = ? WHERE id = ?',
+      'UPDATE people SET name = ?, color = ?, sort_order = ?, google_calendar_id = ?, access_role = ?, has_chores = ? WHERE id = ?',
     ).run(
       typeof name === 'string' && name.trim() ? name.trim() : person.name,
       color ?? person.color,
       Number.isInteger(sortOrder) ? sortOrder : person.sort_order,
       relink ? calendarId : person.google_calendar_id,
       relink ? (typeof accessRole === 'string' ? accessRole : null) : person.access_role,
+      typeof hasChores === 'boolean' ? Number(hasChores) : person.has_chores,
       person.id,
     );
     d.exec('COMMIT');

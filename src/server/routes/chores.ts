@@ -45,7 +45,10 @@ function dayParam(v: unknown): string {
 function activeChores(): Chore[] {
   return (
     db()
-      .prepare('SELECT * FROM chores WHERE archived_on IS NULL ORDER BY sort_order, id')
+      .prepare(
+        `SELECT c.* FROM chores c JOIN people p ON p.id = c.person_id
+          WHERE c.archived_on IS NULL AND p.has_chores = 1 ORDER BY c.sort_order, c.id`,
+      )
       .all() as unknown as ChoreRow[]
   ).map(toChore);
 }
@@ -54,7 +57,10 @@ function activeChores(): Chore[] {
 function choresForStreaks(today: string): Chore[] {
   return (
     db()
-      .prepare('SELECT * FROM chores WHERE archived_on IS NULL OR archived_on > ?')
+      .prepare(
+        `SELECT c.* FROM chores c JOIN people p ON p.id = c.person_id
+          WHERE p.has_chores = 1 AND (c.archived_on IS NULL OR c.archived_on > ?)`,
+      )
       .all(addDay(today, -STREAK_LOOKBACK_DAYS)) as unknown as ChoreRow[]
   ).map(toChore);
 }

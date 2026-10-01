@@ -12,6 +12,8 @@ export class PeopleService {
   readonly people = signal<Person[]>([]);
   /** People with a Google calendar: the ones who can have events. */
   readonly withCalendar = computed(() => this.people().filter((p) => p.calendarId !== null));
+  /** People who get chores (not holidays or shared family calendars). */
+  readonly withChores = computed(() => this.people().filter((p) => p.hasChores));
   /** People filtered out of the views. Remembered per browser. */
   readonly hidden = signal<ReadonlySet<number>>(loadHidden());
 
@@ -48,7 +50,7 @@ export class PeopleService {
   /** `calendarId: null` unlinks; a string links that calendar. */
   update(
     id: number,
-    body: Partial<Pick<Person, 'name' | 'color' | 'sortOrder' | 'calendarId'>> & {
+    body: Partial<Pick<Person, 'name' | 'color' | 'sortOrder' | 'calendarId' | 'hasChores'>> & {
       accessRole?: string;
     },
   ) {
