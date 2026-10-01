@@ -3,6 +3,7 @@ import { CanActivateFn, Router, Routes } from '@angular/router';
 import { Chores } from './chores/chores';
 import { PinService } from './core/pin.service';
 import { Home } from './home/home';
+import { Lists } from './lists/lists';
 import { Meals } from './meals/meals';
 import { Month } from './month/month';
 import { Settings } from './settings/settings';
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: 'month', component: Month, title: 'Month · Wall Calendar' },
   { path: 'chores', component: Chores, title: 'Chores · Wall Calendar' },
   { path: 'meals', component: Meals, title: 'Meals · Wall Calendar' },
+  { path: 'lists', component: Lists, title: 'Lists · Wall Calendar' },
   {
     path: 'settings',
     component: Settings,

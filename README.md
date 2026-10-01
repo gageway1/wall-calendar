@@ -37,6 +37,20 @@ npm run serve:prod     # http://localhost:4000
 The server re-fetches 60 days back to 400 days ahead for each calendar every 90 s and replaces
 the local cache (`src/server/google/sync.ts`).
 
+## Lists (Google Tasks)
+
+The Lists screen shows the household account's Google Tasks lists, the same lists as the Google
+Tasks app on phones. It needs the **Google Tasks API** enabled in the Cloud project and the
+`https://www.googleapis.com/auth/tasks` scope added under Data Access. Then disconnect and reconnect
+Google once so the new permission is granted.
+
+## Night mode and burn-in
+
+Between the sleep and wake times (default 10pm–6am, set in Settings) the wall shows a dim,
+drifting clock; a tap wakes it for 2 minutes. The whole UI also shifts by 1px every 15 minutes.
+IPS LCDs don't burn in like OLED; this guards against temporary image retention. Truly turning the
+backlight off is a box-level job (DPMS or DDC/CI), to be added with the box setup.
+
 ## Parent PIN
 
 A 4–8 digit PIN (Settings → Parent PIN) is asked for every time Settings opens, and before

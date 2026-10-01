@@ -61,6 +61,13 @@ export const httpErrorInterceptor: HttpInterceptorFn = (
 };
 
 function handleHttpError(toasts: ToastService, req: HttpRequest<unknown>, err: HttpErrorResponse) {
+  // Explained on the screen itself (e.g. Lists shows setup steps).
+  if (
+    err.status === 409 &&
+    ['google_scope_missing', 'google_api_disabled'].includes(err.error?.error)
+  ) {
+    return;
+  }
   if (err.status === 409 && err.error?.error === 'google_not_connected') {
     toasts.warn(RECONNECT_WARNING);
     return;

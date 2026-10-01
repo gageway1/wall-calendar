@@ -10,6 +10,24 @@
       <span>{{ n.label }}</span>
     </a>
   }
+  <div class="rail-tools">
+    <button
+      type="button"
+      class="tool"
+      [class.running]="timer.active()"
+      aria-label="Timer"
+      (click)="timer.panelOpen.set(true)"
+    >
+      @if (timer.active()) {
+        <span class="tool-time">{{ timer.label() }}</span>
+      } @else {
+        <app-icon name="timer" />
+      }
+    </button>
+    <button type="button" class="tool" aria-label="Guest Wi-Fi" (click)="wifiOpen.set(true)">
+      <app-icon name="wifi" />
+    </button>
+  </div>
   <button type="button" class="rail-add" aria-label="Add event" (click)="quickAdd.open()">
     <app-icon name="plus" />
   </button>
@@ -21,6 +39,10 @@
 
 <app-dialog />
 
+<app-timer />
+
+<app-wifi-dialog [open]="wifiOpen()" (closed)="wifiOpen.set(false)" />
+
 <app-text-prompt />
 
 <app-pin-pad />
@@ -29,4 +51,8 @@
 
 @if (quickAdd.request(); as r) {
   <app-quick-add [request]="r" />
+}
+
+@if (sleep.asleep()) {
+  <app-sleep-screen />
 }

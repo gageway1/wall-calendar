@@ -262,3 +262,34 @@ code {
     }
   }
 }
+
+.times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin: 0.75rem 0;
+
+  &.off {
+    opacity: 0.4;
+  }
+}
+
+.time-box {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.time-value {
+  font-size: 2rem;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-steps {
+  display: flex;
+  gap: 0.4rem;
+
+  .btn {
+    padding: 0.55rem 0.9rem;
+  }
+}

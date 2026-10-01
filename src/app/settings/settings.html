@@ -202,6 +202,83 @@
   </section>
 
   <section class="card">
+    <div class="card-head">
+      <h2>Night mode</h2>
+      <button
+        type="button"
+        class="switch"
+        role="switch"
+        [class.on]="sleep.config().enabled"
+        [attr.aria-checked]="sleep.config().enabled"
+        (click)="saveSleep({ enabled: !sleep.config().enabled })"
+      >
+        <span class="knob"></span>
+      </button>
+    </div>
+    <p class="muted small">
+      A dim clock with the date, weather and next few events. Tap the screen to wake it for two
+      minutes.
+    </p>
+    <div class="times" [class.off]="!sleep.config().enabled">
+      <div class="time-box">
+        <span class="muted small">Sleep at</span>
+        <span class="time-value">{{ formatMinutes(sleep.config().start) }}</span>
+        <div class="time-steps">
+          <button type="button" class="btn" (click)="stepTime('start', -60)">−1h</button>
+          <button type="button" class="btn" (click)="stepTime('start', -15)">−15m</button>
+          <button type="button" class="btn" (click)="stepTime('start', 15)">+15m</button>
+          <button type="button" class="btn" (click)="stepTime('start', 60)">+1h</button>
+        </div>
+      </div>
+      <div class="time-box">
+        <span class="muted small">Wake at</span>
+        <span class="time-value">{{ formatMinutes(sleep.config().end) }}</span>
+        <div class="time-steps">
+          <button type="button" class="btn" (click)="stepTime('end', -60)">−1h</button>
+          <button type="button" class="btn" (click)="stepTime('end', -15)">−15m</button>
+          <button type="button" class="btn" (click)="stepTime('end', 15)">+15m</button>
+          <button type="button" class="btn" (click)="stepTime('end', 60)">+1h</button>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn preview" (click)="sleep.preview()">
+      Preview (20 seconds)
+    </button>
+  </section>
+
+  <section class="card">
+    <h2>Guest Wi-Fi</h2>
+    @if (wifi(); as w) {
+      @if (w.configured) {
+        <p>
+          <b>{{ w.ssid }}</b>
+          <span class="muted"> · tap the Wi-Fi button on the rail to show the QR code</span>
+        </p>
+        <div class="chores-toggle">
+          <span class="muted small">Hidden network</span>
+          <button
+            type="button"
+            class="switch"
+            role="switch"
+            [class.on]="w.hidden"
+            [attr.aria-checked]="w.hidden"
+            (click)="setWifiHidden(!w.hidden)"
+          >
+            <span class="knob"></span>
+          </button>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" (click)="editWifi()">Change</button>
+          <button type="button" class="btn danger" (click)="removeWifi()">Remove</button>
+        </div>
+      } @else {
+        <p class="muted small">Show guests a QR code that joins your Wi-Fi.</p>
+        <button type="button" class="btn primary" (click)="editWifi()">Set up guest Wi-Fi</button>
+      }
+    }
+  </section>
+
+  <section class="card">
     <h2>Diagnostics</h2>
     <p class="muted small">Try out notifications and error logging.</p>
     <div class="diag">

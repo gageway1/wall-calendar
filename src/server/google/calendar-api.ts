@@ -1,4 +1,5 @@
-import { GoogleError, getAccessToken } from './oauth';
+import { googleRequest } from './http';
+import { GoogleError } from './oauth';
 
 const API = 'https://www.googleapis.com/calendar/v3';
 
@@ -36,29 +37,12 @@ export interface GEventWrite {
   end?: { date?: string | null; dateTime?: string | null; timeZone?: string | null };
 }
 
-async function gapi<T>(
+function gapi<T>(
   path: string,
   query: Record<string, string | undefined> = {},
   init: { method?: string; body?: unknown } = {},
 ): Promise<T> {
-  const token = await getAccessToken();
-  const url = new URL(API + path);
-  for (const [k, v] of Object.entries(query)) if (v !== undefined) url.searchParams.set(k, v);
-
-  const res = await fetch(url, {
-    method: init.method ?? 'GET',
-    headers: {
-      authorization: `Bearer ${token}`,
-      ...(init.body !== undefined && { 'content-type': 'application/json' }),
-    },
-    body: init.body !== undefined ? JSON.stringify(init.body) : undefined,
-    signal: AbortSignal.timeout(20000),
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new GoogleError(String(res.status), body?.error?.message);
-  }
-  return (res.status === 204 ? undefined : res.json()) as Promise<T>;
+  return googleRequest<T>(API + path, query, init);
 }
 
 const eventsPath = (calendarId: string, eventId?: string) =>

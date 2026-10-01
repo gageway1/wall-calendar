@@ -1,0 +1,28 @@
+<button type="button" class="screen" aria-label="Wake the screen" (click)="sleep.wake()">
+  <div
+    #block
+    class="block"
+    [style.transform]="'translate(' + offset().x + 'px, ' + offset().y + 'px)'"
+  >
+    <div class="time">
+      {{ clock.now() | date: 'h:mm' }}<span class="ampm">{{ clock.now() | date: 'a' }}</span>
+    </div>
+    <div class="date">
+      {{ clock.now() | date: 'EEEE, MMMM d' }}
+      @if (temp(); as w) {
+        · <span class="wx">{{ w.icon }}</span> {{ w.t }}°
+      }
+    </div>
+    @if (upcoming().length) {
+      <ul class="events">
+        @for (e of upcoming(); track e.id) {
+          <li>
+            <span class="dot" [style.background]="e.color"></span>
+            <span class="when">{{ e.when }}</span>
+            {{ e.title }}
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</button>

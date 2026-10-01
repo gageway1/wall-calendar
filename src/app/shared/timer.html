@@ -1,0 +1,57 @@
+@if (timer.panelOpen()) {
+  <div class="backdrop" (click)="timer.panelOpen.set(false)">
+    <div class="panel" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <header class="head">
+        <h2>Timer</h2>
+        <button type="button" class="close" aria-label="Hide" (click)="timer.panelOpen.set(false)">
+          <app-icon name="close" />
+        </button>
+      </header>
+
+      @if (timer.active()) {
+        <div class="ring-wrap">
+          <svg viewBox="0 0 280 280" class="ring">
+            <circle class="track" cx="140" cy="140" [attr.r]="radius" />
+            <circle
+              class="fill"
+              cx="140"
+              cy="140"
+              [attr.r]="radius"
+              [attr.stroke]="color()"
+              [attr.stroke-dasharray]="circumference"
+              [attr.stroke-dashoffset]="dashOffset()"
+            />
+          </svg>
+          <div class="readout">{{ timer.label() }}</div>
+        </div>
+        <div class="controls">
+          @if (timer.paused()) {
+            <button type="button" class="btn primary" (click)="timer.resume()">Resume</button>
+          } @else {
+            <button type="button" class="btn" (click)="timer.pause()">Pause</button>
+          }
+          <button type="button" class="btn" (click)="timer.addMinute()">+1 min</button>
+          <button type="button" class="btn danger" (click)="timer.stop()">Stop</button>
+        </div>
+      } @else {
+        <p class="muted">How long?</p>
+        <div class="presets">
+          @for (m of presets; track m) {
+            <button type="button" class="preset" (click)="start(m)">
+              <span class="n">{{ m === 60 ? 1 : m }}</span>
+              <span class="u">{{ m === 60 ? 'hour' : m === 1 ? 'minute' : 'minutes' }}</span>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}
+
+@if (timer.done()) {
+  <button type="button" class="done" (click)="timer.dismissDone()">
+    <span class="done-ring"></span>
+    <span class="done-text">Time's up!</span>
+    <span class="done-hint">Tap to close</span>
+  </button>
+}

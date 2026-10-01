@@ -1,0 +1,76 @@
+// Above everything but the timer alarm: nothing bright should show at night.
+.screen {
+  all: unset;
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  background: #000;
+  cursor: pointer;
+  animation: fade-in 1.5s ease-out;
+}
+
+.block {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  // Dim grey on black: readable across a dark room without lighting it up.
+  color: #5c606a;
+  transition: transform 3s ease-in-out;
+}
+
+.time {
+  font-size: 7rem;
+  font-weight: 200;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: #777c87;
+}
+
+.ampm {
+  font-size: 2rem;
+  margin-left: 0.4rem;
+}
+
+.date {
+  font-size: 1.3rem;
+}
+
+// Color emoji ignore text color; grey and dim them so nothing glows at night.
+.wx {
+  filter: grayscale(1) brightness(0.45);
+}
+
+.events {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.3rem;
+  font-size: 1rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+
+  .when {
+    min-width: 4.5rem;
+    color: #4a4e57;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}

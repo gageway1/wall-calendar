@@ -7,6 +7,7 @@ const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 export const SCOPES = [
   'https://www.googleapis.com/auth/calendar.events',
   'https://www.googleapis.com/auth/calendar.calendarlist.readonly',
+  'https://www.googleapis.com/auth/tasks',
 ];
 
 export class GoogleError extends Error {

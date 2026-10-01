@@ -1,11 +1,14 @@
 import express from 'express';
+import { ApiDisabledError, ScopeMissingError } from './google/http';
 import { NotConnectedError } from './google/oauth';
 import { log } from './logger';
 import { networkErrorCode } from './net-errors';
 import { ensureSyncLoop } from './google/sync';
 import { chores } from './routes/chores';
+import { config } from './routes/config';
 import { events } from './routes/events';
 import { google } from './routes/google';
+import { lists } from './routes/lists';
 import { logs } from './routes/logs';
 import { meals } from './routes/meals';
 import { people } from './routes/people';
@@ -46,6 +49,8 @@ api.use('/logs', logs);
 api.use('/chores', chores);
 api.use('/meals', meals);
 api.use('/pin', pin);
+api.use('/config', config);
+api.use('/lists', lists);
 
 api.use((_req, res) => {
   res.status(404).json({ error: 'not_found' });
@@ -55,6 +60,16 @@ api.use(
   (err: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {
     if (err instanceof NotConnectedError) {
       res.status(409).json({ error: 'google_not_connected' });
+      return;
+    }
+    // Setup states the screen explains itself (e.g. Lists asks you to reconnect Google).
+    if (err instanceof ScopeMissingError) {
+      res.status(409).json({ error: 'google_scope_missing' });
+      return;
+    }
+    if (err instanceof ApiDisabledError) {
+      log('warn', 'api', err.message);
+      res.status(409).json({ error: 'google_api_disabled' });
       return;
     }
     // Couldn't reach Google/Open-Meteo/the internet: expected now and then, not a bug.

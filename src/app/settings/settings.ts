@@ -8,6 +8,8 @@ import { KeyboardService } from '../core/keyboard.service';
 import { GoogleCalendar, GoogleStatus, PERSON_COLORS, Person } from '../core/models';
 import { PeopleService } from '../core/people.service';
 import { PinService } from '../core/pin.service';
+import { SleepConfig, SleepService } from '../core/sleep.service';
+import { formatMinutes } from '../core/date';
 import { TextPromptService } from '../core/text-prompt.service';
 import { GENERIC_ERROR, ToastService } from '../core/toast.service';
 
@@ -33,6 +35,15 @@ export class Settings {
   private readonly prompt = inject(TextPromptService);
   protected readonly pin = inject(PinService);
   protected readonly confirmRemovePin = signal(false);
+  protected readonly sleep = inject(SleepService);
+  protected readonly formatMinutes = formatMinutes;
+  protected readonly wifi = signal<{
+    configured: boolean;
+    ssid?: string;
+    password?: string;
+    security?: 'WPA' | 'WEP' | 'nopass';
+    hidden?: boolean;
+  } | null>(null);
 
   private readonly query = toSignal(inject(ActivatedRoute).queryParamMap);
   protected readonly callbackError = computed(() => !!this.query()?.get('google_error'));
@@ -53,6 +64,7 @@ export class Settings {
   protected readonly confirmRemove = signal<number | null>(null);
 
   constructor() {
+    this.loadWifi();
     void this.pin.load();
     this.loadStatus();
   }
@@ -155,6 +167,71 @@ export class Settings {
         this.toasts.success(cal ? `Linked ${cal.name}` : `${p.name} is wall-only now`);
         setTimeout(() => this.events.refresh(), cal ? 3000 : 0);
       });
+  }
+
+  // --- Sleep -------------------------------------------------------------
+
+  protected saveSleep(change: Partial<SleepConfig>) {
+    const next = { ...this.sleep.config(), ...change };
+    if (next.start === next.end) return;
+    this.sleep.save(next).subscribe();
+  }
+
+  /** Steps a time by `delta` minutes, wrapping around midnight. */
+  protected stepTime(key: 'start' | 'end', delta: number) {
+    const v = (this.sleep.config()[key] + delta + 1440) % 1440;
+    this.saveSleep({ [key]: v });
+  }
+
+  // --- Guest Wi-Fi ---------------------------------------------------------
+
+  private loadWifi() {
+    this.http.get<NonNullable<ReturnType<typeof this.wifi>>>('/api/config/wifi').subscribe({
+      next: (w) => this.wifi.set(w),
+      error: () => {},
+    });
+  }
+
+  protected async editWifi() {
+    const current = this.wifi();
+    const ssid = await this.prompt.ask({
+      title: 'Wi-Fi network name',
+      value: current?.ssid ?? '',
+      maxLength: 64,
+    });
+    if (!ssid) return;
+    const password = await this.prompt.ask({
+      title: `Password for ${ssid}`,
+      value: current?.password ?? '',
+      maxLength: 63,
+    });
+    if (!password) return;
+    this.saveWifi({
+      ssid,
+      password,
+      security: current?.security === 'WEP' ? 'WEP' : 'WPA',
+      hidden: !!current?.hidden,
+    });
+  }
+
+  protected setWifiHidden(hidden: boolean) {
+    const w = this.wifi();
+    if (w?.configured)
+      this.saveWifi({ ssid: w.ssid!, password: w.password!, security: w.security!, hidden });
+  }
+
+  private saveWifi(body: { ssid: string; password: string; security: string; hidden: boolean }) {
+    this.http.put('/api/config/wifi', body).subscribe(() => {
+      this.toasts.success('Guest Wi-Fi saved');
+      this.loadWifi();
+    });
+  }
+
+  protected removeWifi() {
+    this.http.delete('/api/config/wifi').subscribe(() => {
+      this.toasts.success('Guest Wi-Fi removed');
+      this.loadWifi();
+    });
   }
 
   protected async setPin() {

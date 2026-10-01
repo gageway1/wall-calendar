@@ -1,7 +1,19 @@
 import { Component, input } from '@angular/core';
 
 export type IconName =
-  'home' | 'week' | 'month' | 'chores' | 'meals' | 'settings' | 'left' | 'right' | 'close' | 'plus';
+  | 'home'
+  | 'week'
+  | 'month'
+  | 'chores'
+  | 'meals'
+  | 'lists'
+  | 'settings'
+  | 'left'
+  | 'right'
+  | 'close'
+  | 'plus'
+  | 'timer'
+  | 'wifi';
 
 /** Tiny inline stroke icon set, so the kiosk needs no icon font or network. */
 @Component({
@@ -47,6 +59,18 @@ export type IconName =
         }
         @case ('meals') {
           <path d="M7 2v20M4 2v6a3 3 0 0 0 6 0V2M17 22V2c-2.5 1.5-3.5 4.5-3.5 8H17" />
+        }
+        @case ('lists') {
+          <path d="M9 6h12M9 12h12M9 18h12M4 6h.01M4 12h.01M4 18h.01" />
+        }
+        @case ('timer') {
+          <circle cx="12" cy="13" r="8" />
+          <path d="M12 9v4l2.5 2.5M9 2h6" />
+        }
+        @case ('wifi') {
+          <path
+            d="M5 12.55a11 11 0 0 1 14 0M1.5 9a16 16 0 0 1 21 0M8.5 16.1a6 6 0 0 1 7 0M12 20h.01"
+          />
         }
         @case ('close') {
           <path d="M18 6L6 18M6 6l12 12" />

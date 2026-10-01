@@ -1,0 +1,115 @@
+<header class="bar">
+  <div class="nav"><h1>Lists</h1></div>
+  @if (setup() === 'ok') {
+    <div class="tabs">
+      @for (l of lists(); track l.id) {
+        <button type="button" class="tab" [class.on]="selected()?.id === l.id" (click)="choose(l)">
+          {{ l.title }}
+        </button>
+      }
+      <button type="button" class="tab ghost" (click)="newList()">+ New list</button>
+    </div>
+  }
+</header>
+
+@switch (setup()) {
+  @case ('ok') {
+    @if (selected(); as list) {
+      <div class="board">
+        <section class="card items">
+          <div class="items-head">
+            <h2>{{ list.title }}</h2>
+            <span class="muted">{{ open().length }} to get</span>
+          </div>
+          <div class="rows">
+            @for (i of open(); track i.id) {
+              <div class="row">
+                <button type="button" class="item" (click)="toggle(i)">
+                  <span class="check"></span>
+                  <span class="title">{{ i.title }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="x"
+                  [attr.aria-label]="'Remove ' + i.title"
+                  (click)="remove(i)"
+                >
+                  ✕
+                </button>
+              </div>
+            } @empty {
+              <p class="empty">Nothing on the list.</p>
+            }
+          </div>
+          <button type="button" class="btn primary add" (click)="add()">+ Add items</button>
+        </section>
+
+        <section class="card items done-card">
+          <div class="items-head">
+            <h2>Done</h2>
+          </div>
+          <div class="rows">
+            @for (i of done(); track i.id) {
+              <button type="button" class="item done" (click)="toggle(i)">
+                <span class="check">✓</span>
+                <span class="title">{{ i.title }}</span>
+              </button>
+            } @empty {
+              <p class="empty">Checked-off items land here.</p>
+            }
+          </div>
+          @if (done().length) {
+            <!-- Bottom of the card: toasts stack at the top right and would cover it there. -->
+            <button type="button" class="btn add" (click)="clearDone()">Clear done</button>
+          }
+        </section>
+      </div>
+    } @else {
+      <section class="card">
+        <p class="empty">No lists yet.</p>
+        <button type="button" class="btn primary" (click)="newList()">Create a list</button>
+      </section>
+    }
+  }
+  @case ('loading') {
+    <section class="card"><p class="empty">Loading lists…</p></section>
+  }
+  @case ('not_connected') {
+    <section class="card setup">
+      <h2>Connect Google first</h2>
+      <p>Lists use Google Tasks, so they also show up in the Google Tasks app on your phones.</p>
+      <p>Connect the household Google account in Settings.</p>
+    </section>
+  }
+  @case ('scope_missing') {
+    <section class="card setup">
+      <h2>Lists need one more Google permission</h2>
+      <ol>
+        <li>
+          Google Cloud Console → <b>APIs &amp; Services → Library</b> → enable
+          <b>Google Tasks API</b>.
+        </li>
+        <li>
+          <b>Google Auth Platform → Data Access → Add scopes</b> →
+          <code>https://www.googleapis.com/auth/tasks</code> → Save.
+        </li>
+        <li>On a PC: Settings → <b>Disconnect</b>, then <b>Connect Google account</b> again.</li>
+      </ol>
+    </section>
+  }
+  @case ('api_disabled') {
+    <section class="card setup">
+      <h2>Turn on Google Tasks</h2>
+      <p>
+        In Google Cloud Console → <b>APIs &amp; Services → Library</b>, enable
+        <b>Google Tasks API</b>, then come back here.
+      </p>
+    </section>
+  }
+  @case ('offline') {
+    <section class="card setup">
+      <h2>Can't reach Google right now</h2>
+      <p>Lists will load when the internet is back.</p>
+    </section>
+  }
+}
