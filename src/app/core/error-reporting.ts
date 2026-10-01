@@ -19,6 +19,7 @@ const recentlySent = new Map<string, number>();
  * loop can't flood the log, and never throws.
  */
 export function reportError(message: string, detail?: unknown, level: 'error' | 'warn' = 'error') {
+  if (typeof message !== 'string') message = describeError(message);
   const now = Date.now();
   if (now - (recentlySent.get(message) ?? 0) < RESEND_AFTER_MS) return;
   recentlySent.set(message, now);
@@ -76,15 +77,34 @@ function handleHttpError(toasts: ToastService, req: HttpRequest<unknown>, err: H
   reportError(`${req.method} ${req.url} failed (${err.status || 'network'})`, err);
 }
 
+/** A readable one-line description of anything that can be thrown. */
+export function describeError(error: unknown): string {
+  if (error instanceof Error) return `${error.name}: ${error.message}`;
+  if (error instanceof HttpErrorResponse)
+    return `HTTP ${error.status || 'network'} ${error.url ?? ''}`.trim();
+  if (typeof error === 'string') return error;
+  if (error === null || typeof error !== 'object') return String(error);
+  try {
+    const json = JSON.stringify(error);
+    if (json && json !== '{}') return json.slice(0, 300);
+  } catch {}
+  return `Unknown error (${error.constructor?.name ?? 'object'})`;
+}
+
 /** Uncaught exceptions anywhere in the app: log them, tell the user gently. */
 @Injectable()
 export class ToastErrorHandler implements ErrorHandler {
   private readonly toasts = inject(ToastService);
 
   handleError(error: unknown) {
-    console.error(error);
+    // Unhandled promise rejections arrive wrapped.
+    const e = (error as { rejection?: unknown })?.rejection ?? error;
+    console.error(e);
+    // HTTP failures were already toasted (and logged if serious) by the interceptor; a
+    // subscribe() without an error callback re-throws them here, so don't report twice.
+    if (e instanceof HttpErrorResponse) return;
     try {
-      reportError(error instanceof Error ? error.message : String(error), error);
+      reportError(describeError(e), e);
       this.toasts.error(GENERIC_ERROR);
     } catch {}
   }

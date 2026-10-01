@@ -2,6 +2,7 @@ import { db, getSetting, setSetting } from '../db';
 import { listCalendars, listEvents } from './calendar-api';
 import { EventRow, toEventRow } from './event-mapping';
 import { log } from '../logger';
+import { networkErrorCode } from '../net-errors';
 import { NotConnectedError, isConnected } from './oauth';
 
 const SYNC_INTERVAL_MS = 90 * 1000;
@@ -55,25 +56,46 @@ export async function syncAll() {
     .all() as { id: string }[];
 
   let failed = 0;
-  try {
-    await refreshAccessRoles();
-  } catch (err) {
-    if (err instanceof NotConnectedError) throw err;
-    failed++;
-    log('error', 'sync', 'calendar list refresh failed', err);
-  }
-  for (const { id } of calendars) {
+  let offline: string | undefined;
+
+  const attempt = async (what: string, fn: () => Promise<unknown>) => {
+    if (offline) return; // No point trying the rest while the network is down.
     try {
-      await syncCalendar(id);
+      await fn();
     } catch (err) {
       if (err instanceof NotConnectedError) throw err;
+      offline = networkErrorCode(err);
+      if (offline) return;
       failed++;
-      log('error', 'sync', `calendar ${id} failed`, err);
+      log('error', 'sync', `${what} failed`, err);
     }
-  }
+  };
+
+  await attempt('calendar list refresh', refreshAccessRoles);
+  for (const { id } of calendars) await attempt(`calendar ${id}`, () => syncCalendar(id));
+
+  noteReachability(offline);
+  if (offline) return; // Keep last_sync_at honest: the wall is showing older data.
 
   setSetting('google.last_sync_at', new Date().toISOString());
   if (failed === 0 && getSetting('google.error')) setSetting('google.error', '');
+}
+
+let unreachableSince: string | undefined;
+
+/** Logs outage start and end once each, instead of every failed attempt every 90 s. */
+function noteReachability(offlineCode: string | undefined) {
+  if (offlineCode && !unreachableSince) {
+    unreachableSince = new Date().toISOString();
+    log(
+      'warn',
+      'sync',
+      `Google unreachable (${offlineCode}); showing cached events, retrying every 90s`,
+    );
+  } else if (!offlineCode && unreachableSince) {
+    log('info', 'sync', `Google reachable again (offline since ${unreachableSince})`);
+    unreachableSince = undefined;
+  }
 }
 
 /** Caches whether each person's calendar is writable, so the wall can grey out read-only ones. */

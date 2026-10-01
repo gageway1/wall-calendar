@@ -50,16 +50,19 @@ export class Settings {
   }
 
   private loadStatus() {
-    this.http.get<GoogleStatus>('/api/google/status').subscribe((s) => {
-      this.status.set(s);
-      if (s.connected) this.loadCalendars();
+    this.http.get<GoogleStatus>('/api/google/status').subscribe({
+      next: (s) => {
+        this.status.set(s);
+        if (s.connected) this.loadCalendars();
+      },
+      error: () => {}, // Interceptor already warned.
     });
   }
 
   private loadCalendars() {
     this.http
       .get<GoogleCalendar[]>('/api/google/calendars')
-      .subscribe((c) => this.calendars.set(c));
+      .subscribe({ next: (c) => this.calendars.set(c), error: () => {} });
   }
 
   protected syncNow() {

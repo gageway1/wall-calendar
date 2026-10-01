@@ -28,9 +28,10 @@ export function log(level: LogLevel, source: string, message: string, detail?: u
   if (detail !== undefined) entry.detail = serialize(detail);
 
   const line = `[${source}] ${message}`;
-  if (level === 'error') console.error(line, detail ?? '');
-  else if (level === 'warn') console.warn(line, detail ?? '');
-  else console.log(line);
+  const args = detail === undefined ? [line] : [line, detail];
+  if (level === 'error') console.error(...args);
+  else if (level === 'warn') console.warn(...args);
+  else console.log(...args);
 
   try {
     appendFileSync(fileFor(today()), JSON.stringify(entry) + '\n');
@@ -75,8 +76,14 @@ function pruneOncePerDay() {
   }
 }
 
-function serialize(detail: unknown): unknown {
-  if (detail instanceof Error)
-    return { name: detail.name, message: detail.message, stack: detail.stack };
-  return detail;
+function serialize(detail: unknown, depth = 0): unknown {
+  if (!(detail instanceof Error)) return detail;
+  const e = detail as Error & { code?: unknown; cause?: unknown };
+  return {
+    name: e.name,
+    message: e.message,
+    ...(e.code !== undefined && { code: e.code }),
+    stack: e.stack,
+    ...(e.cause !== undefined && depth < 3 && { cause: serialize(e.cause, depth + 1) }),
+  };
 }

@@ -1,6 +1,7 @@
 import express from 'express';
 import { NotConnectedError } from './google/oauth';
 import { log } from './logger';
+import { networkErrorCode } from './net-errors';
 import { ensureSyncLoop } from './google/sync';
 import { events } from './routes/events';
 import { google } from './routes/google';
@@ -48,6 +49,13 @@ api.use(
   (err: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {
     if (err instanceof NotConnectedError) {
       res.status(409).json({ error: 'google_not_connected' });
+      return;
+    }
+    // Couldn't reach Google/Open-Meteo/the internet: expected now and then, not a bug.
+    const offline = networkErrorCode(err);
+    if (offline) {
+      log('warn', 'api', `${req.method} ${req.originalUrl}: internet unreachable (${offline})`);
+      res.status(503).json({ error: 'unreachable' });
       return;
     }
     // Details go to the log, never to the screen.
