@@ -10,6 +10,8 @@ import { events } from './routes/events';
 import { google } from './routes/google';
 import { lists } from './routes/lists';
 import { logs } from './routes/logs';
+import { lunch } from './routes/lunch';
+import { ensureLunchLoop } from './lunch/sync';
 import { meals } from './routes/meals';
 import { people } from './routes/people';
 import { pin } from './routes/pin';
@@ -22,6 +24,7 @@ api.use(express.json());
 // (which imports the server to extract routes) never kicks it off.
 api.use((_req, _res, next) => {
   ensureSyncLoop();
+  ensureLunchLoop();
   next();
 });
 
@@ -51,6 +54,7 @@ api.use('/meals', meals);
 api.use('/pin', pin);
 api.use('/config', config);
 api.use('/lists', lists);
+api.use('/lunch', lunch);
 
 api.use((_req, res) => {
   res.status(404).json({ error: 'not_found' });

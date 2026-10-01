@@ -8,6 +8,7 @@ import { KeyboardService } from '../core/keyboard.service';
 import { GoogleCalendar, GoogleStatus, PERSON_COLORS, Person } from '../core/models';
 import { PeopleService } from '../core/people.service';
 import { PinService } from '../core/pin.service';
+import { LunchService } from '../core/lunch.service';
 import { SleepConfig, SleepService } from '../core/sleep.service';
 import { formatMinutes } from '../core/date';
 import { TextPromptService } from '../core/text-prompt.service';
@@ -36,6 +37,8 @@ export class Settings {
   protected readonly pin = inject(PinService);
   protected readonly confirmRemovePin = signal(false);
   protected readonly sleep = inject(SleepService);
+  protected readonly lunch = inject(LunchService);
+  protected readonly lunchSyncing = signal(false);
   protected readonly formatMinutes = formatMinutes;
   protected readonly wifi = signal<{
     configured: boolean;
@@ -181,6 +184,36 @@ export class Settings {
   protected stepTime(key: 'start' | 'end', delta: number) {
     const v = (this.sleep.config()[key] + delta + 1440) % 1440;
     this.saveSleep({ [key]: v });
+  }
+
+  // --- School lunch ------------------------------------------------------
+
+  protected async editLunchUrl() {
+    const url = await this.prompt.ask({
+      title: 'School menu address',
+      value: this.lunch.config()?.url ?? '',
+      placeholder: 'https://thrillshare-cmsv2.services.thrillshare.com/api/v2/s/…/menus?query_id=…',
+      maxLength: 300,
+    });
+    if (!url) return;
+    this.http.put('/api/lunch/config', { url }).subscribe(() => this.syncLunch());
+  }
+
+  protected setLunchPerson(personId: number | null) {
+    this.http.put('/api/lunch/config', { personId }).subscribe(() => this.lunch.loadConfig());
+  }
+
+  protected syncLunch() {
+    this.lunchSyncing.set(true);
+    this.http.post<{ days: number }>('/api/lunch/sync', {}).subscribe({
+      next: (r) => {
+        this.toasts.success(`Loaded ${r.days} days of school menus`);
+        this.lunch.loadConfig();
+        this.lunch.refresh();
+        this.lunchSyncing.set(false);
+      },
+      error: () => this.lunchSyncing.set(false),
+    });
   }
 
   // --- Guest Wi-Fi ---------------------------------------------------------

@@ -44,6 +44,15 @@ Tasks app on phones. It needs the **Google Tasks API** enabled in the Cloud proj
 `https://www.googleapis.com/auth/tasks` scope added under Data Access. Then disconnect and reconnect
 Google once so the new permission is granted.
 
+## School lunch
+
+`SCHOOL_LUNCH_URL` (or Settings → School lunch) points at the Thrillshare menus API that the
+school's Apptegy dining page loads from, e.g.
+`https://thrillshare-cmsv2.services.thrillshare.com/api/v2/s/273117/menus?locale=en&query_id=49256`
+(`query_id` is the page's `?filter=` value). It's fetched every 6 hours, stored in SQLite (works
+offline), and shown on Meals (tap for the full menu) and Home (today's, or the next school day's
+after 2pm). The dining page itself sits behind a browser check, so use the API.
+
 ## Night mode and burn-in
 
 Between the sleep and wake times (default 10pm–6am, set in Settings) the wall shows a dim,

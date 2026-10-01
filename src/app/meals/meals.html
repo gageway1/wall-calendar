@@ -9,26 +9,71 @@
     <button type="button" class="icon-btn" aria-label="Next week" (click)="shift(1)">
       <app-icon name="right" />
     </button>
-    <h1>Dinners · {{ title() }}</h1>
+    <h1>Meals · {{ title() }}</h1>
   </div>
 </header>
 
 <div class="days" appSwipe (swipeLeft)="shift(1)" (swipeRight)="shift(-1)">
   @for (d of days(); track d.key) {
-    <button
-      type="button"
-      class="day card"
-      [class.today]="d.isToday"
-      [class.past]="d.isPast"
-      (click)="plan(d)"
-    >
+    <div class="day card" [class.today]="d.isToday" [class.past]="d.isPast">
       <span class="dow">{{ d.dow }}</span>
       <span class="num">{{ d.num }}</span>
-      @if (d.dinner) {
-        <span class="dinner">{{ d.dinner }}</span>
-      } @else {
-        <span class="dinner empty">+ Plan dinner</span>
+
+      @if (d.lunch; as l) {
+        <button
+          type="button"
+          class="slot lunch"
+          [disabled]="!!l.noSchool"
+          (click)="menuOpen.set({ dow: d.dow, lunch: l })"
+        >
+          <span class="slot-label">🏫 {{ lunchSvc.label() }}</span>
+          @if (l.noSchool) {
+            <span class="slot-text muted">No school · {{ l.noSchool }}</span>
+          } @else {
+            <span class="slot-text">{{ entrees(l) }}</span>
+          }
+        </button>
       }
-    </button>
+
+      <button type="button" class="slot dinner" (click)="plan(d)">
+        <span class="slot-label">🍽 Dinner</span>
+        @if (d.dinner) {
+          <span class="slot-text big">{{ d.dinner }}</span>
+        } @else {
+          <span class="slot-text empty">+ Plan dinner</span>
+        }
+      </button>
+    </div>
   }
 </div>
+
+@if (menuOpen(); as m) {
+  <div class="backdrop" (click)="menuOpen.set(null)">
+    <div class="menu-panel" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <button type="button" class="close" aria-label="Close" (click)="menuOpen.set(null)">
+        <app-icon name="close" />
+      </button>
+      <h2>{{ m.dow }} · school menu</h2>
+      <div class="menu-cols">
+        <section>
+          <h3>Lunch</h3>
+          <ul>
+            @for (item of m.lunch.lunch; track $index) {
+              <li [class.entree]="$index < 2">{{ item }}</li>
+            }
+          </ul>
+        </section>
+        @if (m.lunch.breakfast.length) {
+          <section>
+            <h3>Breakfast</h3>
+            <ul>
+              @for (item of m.lunch.breakfast; track $index) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </section>
+        }
+      </div>
+    </div>
+  </div>
+}

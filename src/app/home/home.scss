@@ -190,9 +190,15 @@
   font-size: 1rem;
 }
 
+.meal-lines {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 2rem;
+  margin-top: 0.5rem;
+}
+
 .tonight {
   display: inline-block;
-  margin-top: 0.5rem;
   font-size: 1.3rem;
   color: var(--text);
   text-decoration: none;

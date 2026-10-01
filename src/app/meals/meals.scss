@@ -14,15 +14,10 @@
 }
 
 .day {
-  all: unset;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   padding: 1.25rem 1rem;
-  border-radius: var(--radius);
-  background: var(--surface);
-  cursor: pointer;
 
   &.today {
     box-shadow: inset 0 0 0 2px var(--accent);
@@ -30,10 +25,6 @@
 
   &.past {
     opacity: 0.6;
-  }
-
-  &:active {
-    background: var(--surface-2);
   }
 }
 
@@ -55,16 +46,109 @@
   }
 }
 
-.dinner {
-  margin-top: 1.5rem;
-  font-size: 1.5rem;
-  font-weight: 500;
+.slot {
+  all: unset;
+  box-sizing: border-box;
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  cursor: pointer;
+
+  &:active:not(:disabled) {
+    filter: brightness(1.2);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &.dinner {
+    flex: 1;
+    align-content: start;
+  }
+}
+
+.slot-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.slot-text {
+  font-size: 1.05rem;
   line-height: 1.3;
   overflow-wrap: anywhere;
 
+  &.big {
+    font-size: 1.4rem;
+    font-weight: 500;
+  }
+
   &.empty {
-    font-size: 1.1rem;
-    font-weight: 400;
     color: var(--text-muted);
   }
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 0.6);
+}
+
+.menu-panel {
+  position: relative;
+  width: min(44rem, 100%);
+  padding: 2rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+
+  h2 {
+    margin: 0 2.5rem 1rem 0;
+    font-size: 1.6rem;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 0.3rem;
+    font-size: 1.15rem;
+  }
+
+  .entree {
+    font-weight: 600;
+  }
+}
+
+.menu-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.close {
+  all: unset;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
 }

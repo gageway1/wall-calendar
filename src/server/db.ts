@@ -110,6 +110,15 @@ const migrations: string[] = [
   ALTER TABLE people ADD COLUMN chores_locked INTEGER NOT NULL DEFAULT 0;
   UPDATE people SET chores_locked = 1 WHERE google_calendar_id IS NULL;
   `,
+  `
+  -- School breakfast/lunch as posted by the school (JSON arrays of lines).
+  CREATE TABLE school_menu (
+    day        TEXT PRIMARY KEY,
+    breakfast  TEXT NOT NULL,
+    lunch      TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  `,
 ];
 
 function migrate(db: DatabaseSync) {

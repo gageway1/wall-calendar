@@ -293,3 +293,16 @@ code {
     padding: 0.55rem 0.9rem;
   }
 }
+
+.url {
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.warn {
+  color: #ffa94d;
+}
+
+.lunch-actions {
+  margin-top: 1rem;
+}

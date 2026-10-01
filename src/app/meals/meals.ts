@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ClockService } from '../core/clock.service';
 import { addDays, dayKey, parseDay, startOfWeek } from '../core/date';
+import { LunchDay, LunchService, entrees } from '../core/lunch.service';
 import { Meal } from '../core/models';
 import { TextPromptService } from '../core/text-prompt.service';
 import { ToastService } from '../core/toast.service';
@@ -24,6 +25,10 @@ export class Meals {
   private readonly clock = inject(ClockService);
   private readonly prompt = inject(TextPromptService);
   private readonly toasts = inject(ToastService);
+  protected readonly lunchSvc = inject(LunchService);
+  protected readonly entrees = entrees;
+  /** Day whose full school menu is open. */
+  protected readonly menuOpen = signal<{ dow: string; lunch: LunchDay } | null>(null);
 
   protected readonly offset = signal(0);
   private readonly meals = signal<Meal[]>([]);
@@ -32,6 +37,11 @@ export class Meals {
   private readonly start = computed(() =>
     addDays(startOfWeek(parseDay(this.clock.today())), this.offset() * 7),
   );
+
+  private readonly lunches = this.lunchSvc.watchRange(() => ({
+    from: dayKey(this.start()),
+    to: dayKey(addDays(this.start(), 7)),
+  }));
 
   constructor() {
     effect((onCleanup) => {
@@ -51,6 +61,7 @@ export class Meals {
   protected readonly days = computed(() => {
     const today = this.clock.today();
     const byDay = new Map(this.meals().map((m) => [m.day, m.title]));
+    const lunchByDay = new Map(this.lunches().map((l) => [l.day, l]));
     return Array.from({ length: 7 }, (_, i) => {
       const date = addDays(this.start(), i);
       const key = dayKey(date);
@@ -61,6 +72,7 @@ export class Meals {
         isToday: key === today,
         isPast: key < today,
         dinner: byDay.get(key) ?? null,
+        lunch: lunchByDay.get(key) ?? null,
       };
     });
   });

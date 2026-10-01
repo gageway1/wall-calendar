@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ChoresService } from '../core/chores.service';
+import { LunchService, entrees } from '../core/lunch.service';
 import { ClockService } from '../core/clock.service';
 import { addDays, dayKey, eventsForDay, formatTime, parseDay } from '../core/date';
 import { DialogService } from '../core/dialog.service';
@@ -14,6 +15,7 @@ import { RouterLink } from '@angular/router';
 
 const WEEK_PILLS = 3;
 const fmtDow = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
+const fmtDowLong = new Intl.DateTimeFormat(undefined, { weekday: 'long' });
 
 @Component({
   selector: 'app-home',
@@ -31,6 +33,34 @@ export class Home {
   private readonly http = inject(HttpClient);
 
   protected readonly dinner = signal<string | null>(null);
+  protected readonly lunchSvc = inject(LunchService);
+
+  private readonly lunches = this.lunchSvc.watchRange(() => {
+    const today = parseDay(this.clock.today());
+    return { from: dayKey(today), to: dayKey(addDays(today, 8)) };
+  });
+
+  /**
+   * The lunch worth knowing about: today's until 2pm (it's been eaten after that), then the next
+   * school day's, so the evening shows tomorrow's for packing-lunch decisions.
+   */
+  protected readonly lunchLine = computed(() => {
+    const now = this.clock.now();
+    const today = this.clock.today();
+    const from = now.getHours() >= 14 ? dayKey(addDays(parseDay(today), 1)) : today;
+    const next = this.lunches().find((l) => l.day >= from);
+    if (!next) return null;
+    const diff = Math.round(
+      (parseDay(next.day).getTime() - parseDay(today).getTime()) / 86_400_000,
+    );
+    const when =
+      diff === 0 ? '' : diff === 1 ? 'Tomorrow · ' : `${fmtDowLong.format(parseDay(next.day))} · `;
+    return {
+      label: this.lunchSvc.label(),
+      text: next.noSchool ? `No school (${next.noSchool})` : entrees(next),
+      when,
+    };
+  });
 
   constructor() {
     // Tonight's dinner, refreshed when the date flips.

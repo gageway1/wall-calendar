@@ -4,9 +4,17 @@
       {{ clock.now() | date: 'h:mm' }}<span class="ampm">{{ clock.now() | date: 'a' }}</span>
     </div>
     <div class="date">{{ clock.now() | date: 'EEEE, MMMM d' }}</div>
-    @if (dinner(); as d) {
-      <a class="tonight" routerLink="/meals">🍽 Tonight: {{ d }}</a>
-    }
+    <div class="meal-lines">
+      @if (dinner(); as d) {
+        <a class="tonight" routerLink="/meals">🍽 Tonight: {{ d }}</a>
+      }
+      @if (lunchLine(); as l) {
+        <a class="tonight" routerLink="/meals">
+          🏫 {{ l.label }}: <span class="muted">{{ l.when }}</span
+          >{{ l.text }}
+        </a>
+      }
+    </div>
   </div>
 
   @if (current(); as w) {

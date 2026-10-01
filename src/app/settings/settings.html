@@ -247,6 +247,59 @@
   </section>
 
   <section class="card">
+    <h2>School lunch</h2>
+    @if (lunch.config(); as c) {
+      @if (c.url) {
+        <p class="muted small url">{{ c.url }}</p>
+        <p class="small">
+          @if (c.broken) {
+            <span class="warn">The school's page changed and can't be read right now.</span>
+          } @else if (c.days) {
+            {{ c.days }} days loaded, through {{ c.through }}. Checked every 6 hours.
+          } @else {
+            Nothing loaded yet.
+          }
+        </p>
+        <div class="muted small">Whose lunch is it?</div>
+        <div class="chips">
+          <button
+            type="button"
+            class="btn"
+            [class.primary]="!c.personId"
+            (click)="setLunchPerson(null)"
+          >
+            Just "School"
+          </button>
+          @for (p of peopleSvc.withChores(); track p.id) {
+            <button
+              type="button"
+              class="btn"
+              [class.primary]="c.personId === p.id"
+              (click)="setLunchPerson(p.id)"
+            >
+              {{ p.name }}
+            </button>
+          }
+        </div>
+        <div class="actions lunch-actions">
+          <button type="button" class="btn" [disabled]="lunchSyncing()" (click)="syncLunch()">
+            {{ lunchSyncing() ? 'Checking…' : 'Check now' }}
+          </button>
+          <button type="button" class="btn" (click)="editLunchUrl()">Change page</button>
+        </div>
+      } @else {
+        <p class="muted small">
+          Add the school's menu address and the menu shows on Meals and Home, updated automatically.
+          (Set <code>SCHOOL_LUNCH_URL</code> in <code>.env</code> to skip typing it.)
+        </p>
+        <button type="button" class="btn primary" (click)="editLunchUrl()">
+          Set up school lunch
+        </button>
+      }
+    }
+  </section>
+
+  <section class="card">
     <h2>Guest Wi-Fi</h2>
     @if (wifi(); as w) {
       @if (w.configured) {
