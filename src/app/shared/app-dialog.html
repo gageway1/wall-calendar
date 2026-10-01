@@ -19,6 +19,27 @@
             @if (descriptionText()) {
               <p class="description">{{ descriptionText() }}</p>
             }
+            @if (canEdit()) {
+              @if (s.event.recurring) {
+                <p class="muted small">Repeating event: edits apply to this day only.</p>
+              }
+              @if (error(); as e) {
+                <p class="error">{{ e }}</p>
+              }
+              <div class="actions">
+                <button
+                  type="button"
+                  class="btn danger"
+                  [disabled]="deleting()"
+                  (click)="remove(s.event)"
+                >
+                  {{
+                    confirmDelete() ? 'Tap again to delete' : deleting() ? 'Deleting…' : 'Delete'
+                  }}
+                </button>
+                <button type="button" class="btn primary" (click)="edit(s.event)">Edit</button>
+              </div>
+            }
           }
         }
         @case ('day') {
@@ -30,6 +51,9 @@
               } @empty {
                 <p class="empty">Nothing scheduled.</p>
               }
+            </div>
+            <div class="actions">
+              <button type="button" class="btn primary" (click)="addOn(s.day)">+ Add event</button>
             </div>
           }
         }

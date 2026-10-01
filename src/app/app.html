@@ -16,4 +16,12 @@
   <router-outlet />
 </main>
 
+@if (showAdd() && !quickAdd.request() && !dialogs.state()) {
+  <button type="button" class="fab" aria-label="Add event" (click)="quickAdd.open()">+</button>
+}
+
 <app-dialog />
+
+@if (quickAdd.request(); as r) {
+  <app-quick-add [request]="r" />
+}

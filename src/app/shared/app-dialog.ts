@@ -1,6 +1,11 @@
-import { Component, computed, inject } from '@angular/core';
-import { describeWhen, parseDay } from '../core/date';
+import { HttpClient } from '@angular/common/http';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { DayKey, describeWhen, parseDay } from '../core/date';
 import { DialogService } from '../core/dialog.service';
+import { EventsService } from '../core/events.service';
+import { CalEvent } from '../core/models';
+import { PeopleService } from '../core/people.service';
+import { QuickAddService } from '../core/quick-add.service';
 import { EventPill } from './event-pill';
 import { Icon } from './icon';
 
@@ -19,8 +24,63 @@ const fmtLongDay = new Intl.DateTimeFormat(undefined, {
   host: { '(document:keydown.escape)': 'dialogs.close()' },
 })
 export class AppDialog {
+  private readonly http = inject(HttpClient);
+  private readonly events = inject(EventsService);
+  private readonly people = inject(PeopleService);
+  private readonly quickAdd = inject(QuickAddService);
   protected readonly dialogs = inject(DialogService);
   protected readonly describeWhen = describeWhen;
+
+  protected readonly confirmDelete = signal(false);
+  protected readonly deleting = signal(false);
+  protected readonly error = signal<string | null>(null);
+
+  constructor() {
+    // Fresh state whenever the dialog opens on something else.
+    effect(() => {
+      this.dialogs.state();
+      this.confirmDelete.set(false);
+      this.deleting.set(false);
+      this.error.set(null);
+    });
+  }
+
+  protected readonly canEdit = computed(() => {
+    const s = this.dialogs.state();
+    if (s?.kind !== 'event') return false;
+    return this.people.people().find((p) => p.id === s.event.personId)?.canWrite ?? false;
+  });
+
+  protected edit(event: CalEvent) {
+    this.dialogs.close();
+    this.quickAdd.open({ event });
+  }
+
+  protected addOn(day: DayKey) {
+    this.dialogs.close();
+    this.quickAdd.open({ day });
+  }
+
+  /** Two taps: the first arms it, the second deletes. */
+  protected remove(event: CalEvent) {
+    if (!this.confirmDelete()) {
+      this.confirmDelete.set(true);
+      return;
+    }
+    this.deleting.set(true);
+    const url = `/api/events/${encodeURIComponent(event.calendarId)}/${encodeURIComponent(event.eventId)}`;
+    this.http.delete(url).subscribe({
+      next: () => {
+        this.events.refresh();
+        this.dialogs.close();
+      },
+      error: () => {
+        this.deleting.set(false);
+        this.confirmDelete.set(false);
+        this.error.set('Could not delete. Try again.');
+      },
+    });
+  }
 
   protected readonly dayTitle = computed(() => {
     const s = this.dialogs.state();

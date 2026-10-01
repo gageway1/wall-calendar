@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { ClockService } from '../core/clock.service';
 import { addDays, dayKey, eventsForDay, parseDay, startOfWeek } from '../core/date';
 import { EventsService } from '../core/events.service';
+import { QuickAddService } from '../core/quick-add.service';
 import { WeatherService, describeWeather } from '../core/weather.service';
 import { EventPill } from '../shared/event-pill';
 import { Icon } from '../shared/icon';
@@ -25,6 +26,7 @@ const fmtDow = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
 export class Week {
   private readonly clock = inject(ClockService);
   private readonly weather = inject(WeatherService);
+  protected readonly quickAdd = inject(QuickAddService);
 
   /** Offset in weeks from the current week. */
   protected readonly offset = signal(0);

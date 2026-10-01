@@ -49,7 +49,7 @@ expose it to the internet.
 
 1. ✅ Skeleton: Home screen with clock and weather, SQLite schema
 2. ✅ Google Calendar sync: OAuth, calendar-to-person mapping, agenda/week/month views
-3. Quick-add on the wall: tap a day, pick a person, type a title on the on-screen keyboard. Phones use the Google Calendar app.
+3. ✅ Quick-add on the wall: + button or tap a day, pick a person, type on the built-in keyboard, then set the start and length with steppers. Edit and delete from event details. Phones use the Google Calendar app.
 4. Chores, meal plan, grocery list
 5. Box: `setup.sh` (Ubuntu Server + cage + Chromium kiosk + systemd), dimming schedule
 6. Polish: touch targets, return to Home when idle, readability from across the room

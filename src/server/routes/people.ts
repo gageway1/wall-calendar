@@ -10,6 +10,7 @@ interface PersonRow {
   color: string;
   google_calendar_id: string | null;
   sort_order: number;
+  access_role: string | null;
 }
 
 export const toPerson = (r: PersonRow) => ({
@@ -18,6 +19,7 @@ export const toPerson = (r: PersonRow) => ({
   color: r.color,
   calendarId: r.google_calendar_id,
   sortOrder: r.sort_order,
+  canWrite: r.access_role === null || r.access_role === 'writer' || r.access_role === 'owner',
 });
 
 const COLOR = /^#[0-9a-f]{6}$/i;
@@ -34,7 +36,7 @@ people.get('/', (_req, res) => {
 });
 
 people.post('/', (req, res) => {
-  const { name, color, calendarId } = req.body ?? {};
+  const { name, color, calendarId, accessRole } = req.body ?? {};
   if (typeof name !== 'string' || !name.trim() || !COLOR.test(color)) {
     res.status(400).json({ error: 'name and #rrggbb color are required' });
     return;
@@ -43,8 +45,16 @@ people.post('/', (req, res) => {
     n: number;
   };
   const result = db()
-    .prepare('INSERT INTO people (name, color, google_calendar_id, sort_order) VALUES (?, ?, ?, ?)')
-    .run(name.trim(), color, calendarId ?? null, next.n);
+    .prepare(
+      'INSERT INTO people (name, color, google_calendar_id, sort_order, access_role) VALUES (?, ?, ?, ?, ?)',
+    )
+    .run(
+      name.trim(),
+      color,
+      typeof calendarId === 'string' ? calendarId : null,
+      next.n,
+      typeof accessRole === 'string' ? accessRole : null,
+    );
 
   // Pull the new calendar right away rather than waiting for the next sync tick.
   if (calendarId) {

@@ -90,6 +90,12 @@ const migrations: string[] = [
     created_at TEXT NOT NULL
   );
   `,
+  `
+  -- Cached from Google's calendar list; NULL means unknown (assume writable).
+  ALTER TABLE people ADD COLUMN access_role TEXT;
+  -- Instance of a recurring series: edits/deletes from the wall touch this occurrence only.
+  ALTER TABLE events ADD COLUMN recurring INTEGER NOT NULL DEFAULT 0;
+  `,
 ];
 
 function migrate(db: DatabaseSync) {

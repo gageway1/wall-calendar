@@ -4,6 +4,30 @@
 
 <div class="scroll">
   <section class="card">
+    <h2>On-screen keyboard</h2>
+    <p class="muted small">
+      Built-in works everywhere, including the Linux kiosk. Choose System on a tablet to use its own
+      keyboard instead. Saved per screen.
+    </p>
+    <div class="seg">
+      <button
+        type="button"
+        [class.on]="keyboard.mode() === 'builtin'"
+        (click)="keyboard.set('builtin')"
+      >
+        Built-in
+      </button>
+      <button
+        type="button"
+        [class.on]="keyboard.mode() === 'system'"
+        (click)="keyboard.set('system')"
+      >
+        System
+      </button>
+    </div>
+  </section>
+
+  <section class="card">
     <h2>Google account</h2>
 
     @if (callbackError(); as err) {

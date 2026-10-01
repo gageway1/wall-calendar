@@ -40,3 +40,27 @@
   min-height: 0;
   padding: var(--gap);
 }
+
+.fab {
+  all: unset;
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  z-index: 50;
+  width: 5rem;
+  height: 5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 3rem;
+  font-weight: 300;
+  line-height: 1;
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.45);
+  cursor: pointer;
+
+  &:active {
+    filter: brightness(1.15);
+  }
+}

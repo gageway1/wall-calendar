@@ -1,5 +1,9 @@
 import {
   addDays,
+  atMinutes,
+  daysBetween,
+  formatDuration,
+  formatMinutes,
   dayKey,
   eventOnDay,
   eventsForDay,
@@ -12,6 +16,7 @@ import { CalEvent } from './models';
 
 const ev = (over: Partial<CalEvent>): CalEvent => ({
   id: 'x',
+  eventId: 'x',
   calendarId: 'c',
   title: 't',
   location: null,
@@ -19,6 +24,7 @@ const ev = (over: Partial<CalEvent>): CalEvent => ({
   start: '',
   end: '',
   allDay: false,
+  recurring: false,
   personId: 1,
   personName: 'P',
   color: '#000000',
@@ -80,5 +86,19 @@ describe('date helpers', () => {
     expect(formatTime(at(2026, 1, 1, 9, 30))).toBe('9:30am');
     expect(formatTime(at(2026, 1, 1, 12))).toBe('12pm');
     expect(formatTime(at(2026, 1, 1, 0, 5))).toBe('12:05am');
+  });
+
+  it('quick-add time helpers', () => {
+    expect(formatMinutes(720)).toBe('12:00pm');
+    expect(formatMinutes(0)).toBe('12:00am');
+    expect(formatMinutes(13 * 60 + 45)).toBe('1:45pm');
+    expect(formatDuration(60)).toBe('1 hr');
+    expect(formatDuration(90)).toBe('1 hr 30 min');
+    expect(formatDuration(15)).toBe('15 min');
+    expect(daysBetween('2026-10-30', '2026-11-02')).toBe(3);
+    expect(atMinutes('2026-10-01', 750).getHours()).toBe(12);
+    expect(atMinutes('2026-10-01', 750).getMinutes()).toBe(30);
+    // Past midnight rolls into the next day.
+    expect(dayKey(atMinutes('2026-10-01', 25 * 60))).toBe('2026-10-02');
   });
 });

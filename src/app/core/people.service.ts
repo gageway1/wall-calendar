@@ -30,7 +30,12 @@ export class PeopleService {
     } catch {}
   }
 
-  create(body: { name: string; color: string; calendarId: string }): Observable<Person> {
+  create(body: {
+    name: string;
+    color: string;
+    calendarId: string;
+    accessRole: string;
+  }): Observable<Person> {
     return this.http.post<Person>('/api/people', body).pipe(tap(() => this.load()));
   }
 

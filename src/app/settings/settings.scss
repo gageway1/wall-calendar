@@ -137,3 +137,25 @@ input.name {
       0 0 0 5px var(--text);
   }
 }
+
+.seg {
+  display: inline-flex;
+  margin-top: 0.75rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: var(--bg);
+
+  button {
+    all: unset;
+    padding: 0.6rem 1.6rem;
+    border-radius: 999px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+
+    &.on {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+  }
+}

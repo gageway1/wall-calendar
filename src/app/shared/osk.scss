@@ -1,0 +1,51 @@
+:host {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  touch-action: manipulation;
+}
+
+.row {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.key {
+  all: unset;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 3.3rem;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 1.35rem;
+  cursor: pointer;
+
+  &:active {
+    background: color-mix(in srgb, var(--accent) 35%, var(--surface-2));
+  }
+
+  &.wide {
+    flex-grow: 1.5;
+  }
+
+  &.space {
+    flex-grow: 5;
+    font-size: 1rem;
+    color: var(--text-muted);
+  }
+
+  &.on {
+    background: color-mix(in srgb, var(--accent) 30%, var(--surface-2));
+  }
+
+  &.done {
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}

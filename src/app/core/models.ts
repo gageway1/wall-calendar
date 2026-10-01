@@ -4,10 +4,14 @@ export interface Person {
   color: string;
   calendarId: string | null;
   sortOrder: number;
+  /** False when the calendar is shared view-only with the household account. */
+  canWrite: boolean;
 }
 
 export interface CalEvent {
+  /** `${calendarId}/${eventId}`, unique across calendars. */
   id: string;
+  eventId: string;
   calendarId: string;
   title: string;
   location: string | null;
@@ -16,9 +20,17 @@ export interface CalEvent {
   start: string;
   end: string;
   allDay: boolean;
+  /** One occurrence of a repeating series; edits apply to this occurrence only. */
+  recurring: boolean;
   personId: number;
   personName: string;
   color: string;
+}
+
+export interface TitleSuggestion {
+  title: string;
+  personId: number;
+  count: number;
 }
 
 export interface GoogleStatus {

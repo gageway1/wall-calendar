@@ -10,6 +10,7 @@ export interface EventRow {
   start_at: string;
   end_at: string;
   all_day: 0 | 1;
+  recurring: 0 | 1;
   updated_at: string;
 }
 
@@ -33,6 +34,7 @@ export function toEventRow(calendarId: string, e: GEvent): EventRow | null {
     start_at: start,
     end_at: end,
     all_day: allDay ? 1 : 0,
+    recurring: e.recurringEventId ? 1 : 0,
     updated_at: e.updated ?? new Date().toISOString(),
   };
 }

@@ -1,0 +1,37 @@
+@for (row of rows; track $index; let last = $last) {
+  <div class="row">
+    @if (last) {
+      <button
+        type="button"
+        class="key wide"
+        [class.on]="upper()"
+        aria-label="Shift"
+        (pointerdown)="toggleShift($event)"
+      >
+        ⇧
+      </button>
+    }
+    @for (k of row; track k) {
+      <button type="button" class="key" (pointerdown)="press($event, k)">{{ label(k) }}</button>
+    }
+    @if (last) {
+      <button
+        type="button"
+        class="key wide"
+        aria-label="Backspace"
+        (pointerdown)="backspaceDown($event)"
+        (pointerup)="stopRepeat()"
+        (pointerleave)="stopRepeat()"
+        (pointercancel)="stopRepeat()"
+      >
+        ⌫
+      </button>
+    }
+  </div>
+}
+<div class="row">
+  <button type="button" class="key" (pointerdown)="press($event, '&')">&amp;</button>
+  <button type="button" class="key space" (pointerdown)="space($event)">space</button>
+  <button type="button" class="key" (pointerdown)="press($event, '?')">?</button>
+  <button type="button" class="key wide done" (pointerdown)="done($event)">Done</button>
+</div>

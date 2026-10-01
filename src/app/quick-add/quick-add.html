@@ -1,0 +1,145 @@
+<div class="backdrop" (click)="close()">
+  <div class="panel" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <header class="head">
+      <h2>{{ editing() ? 'Edit event' : 'New event' }}</h2>
+      <button type="button" class="close" aria-label="Close" (click)="close()">
+        <app-icon name="close" />
+      </button>
+    </header>
+
+    <div class="body">
+      <div class="left">
+        <section>
+          <div class="label">Who</div>
+          <div class="chips">
+            @for (p of people.people(); track p.id) {
+              <button
+                type="button"
+                class="chip"
+                [class.selected]="personId() === p.id"
+                [disabled]="!p.canWrite"
+                [style.--c]="p.color"
+                [title]="p.canWrite ? '' : 'Shared view-only'"
+                (click)="personId.set(p.id)"
+              >
+                <span class="dot"></span>{{ p.name }}
+              </button>
+            } @empty {
+              <span class="muted">Add calendars in Settings first.</span>
+            }
+          </div>
+        </section>
+
+        <section>
+          <div class="label">What</div>
+          <input
+            class="title-input"
+            placeholder="Event title"
+            maxlength="200"
+            autocomplete="off"
+            [attr.inputmode]="keyboard.mode() === 'builtin' ? 'none' : null"
+            [attr.autofocus]="keyboard.mode() === 'system' ? '' : null"
+            [value]="title()"
+            (input)="title.set($any($event.target).value)"
+            (keydown.enter)="save()"
+          />
+          @if (titleSuggestions().length) {
+            <div class="suggestions">
+              @for (s of titleSuggestions(); track s) {
+                <button type="button" class="suggestion" (click)="title.set(s)">{{ s }}</button>
+              }
+            </div>
+          }
+        </section>
+
+        @if (keyboard.mode() === 'builtin') {
+          <app-osk [autoCap]="autoCap()" (key)="onKey($event)" />
+        }
+      </div>
+
+      <div class="right">
+        <section>
+          <div class="label">When</div>
+          <div class="date-row">
+            <button
+              type="button"
+              class="icon-btn"
+              aria-label="Previous day"
+              (click)="shiftDate(-1)"
+            >
+              <app-icon name="left" />
+            </button>
+            <div class="date">{{ dateLabel() }}</div>
+            <button type="button" class="icon-btn" aria-label="Next day" (click)="shiftDate(1)">
+              <app-icon name="right" />
+            </button>
+          </div>
+
+          <div class="toggle">
+            <button type="button" [class.on]="!allDay()" (click)="allDay.set(false)">Timed</button>
+            <button type="button" [class.on]="allDay()" (click)="allDay.set(true)">All day</button>
+          </div>
+
+          @if (!allDay()) {
+            <div class="value">{{ formatMinutes(startMin()) }}</div>
+            <div class="steppers">
+              <div class="stepper">
+                <button type="button" (click)="shiftStart(-60)">−</button>
+                <span>1 hr</span>
+                <button type="button" (click)="shiftStart(60)">+</button>
+              </div>
+              <div class="stepper">
+                <button type="button" (click)="shiftStart(-15)">−</button>
+                <span>15 min</span>
+                <button type="button" (click)="shiftStart(15)">+</button>
+              </div>
+            </div>
+          }
+        </section>
+
+        <section>
+          <div class="label">Length</div>
+          @if (allDay()) {
+            <div class="value">{{ days() }} {{ days() === 1 ? 'day' : 'days' }}</div>
+            <div class="steppers">
+              <div class="stepper">
+                <button type="button" (click)="shiftDays(-1)">−</button>
+                <span>1 day</span>
+                <button type="button" (click)="shiftDays(1)">+</button>
+              </div>
+            </div>
+          } @else {
+            <div class="value">{{ formatDuration(lengthMin()) }}</div>
+            <div class="steppers">
+              <div class="stepper">
+                <button type="button" (click)="shiftLength(-60)">−</button>
+                <span>1 hr</span>
+                <button type="button" (click)="shiftLength(60)">+</button>
+              </div>
+              <div class="stepper">
+                <button type="button" (click)="shiftLength(-15)">−</button>
+                <span>15 min</span>
+                <button type="button" (click)="shiftLength(15)">+</button>
+              </div>
+            </div>
+          }
+        </section>
+
+        <div class="summary">{{ rangeLabel() }}</div>
+        @if (editing()?.recurring) {
+          <div class="muted small">Repeating event: changes apply to this day only.</div>
+        }
+        @if (error(); as e) {
+          <div class="error">{{ e }}</div>
+        }
+
+        <div class="actions">
+          <button type="button" class="btn" (click)="close()">Cancel</button>
+          <button type="button" class="btn primary" [disabled]="!canSave()" (click)="save()">
+            {{ saving() ? 'Saving…' : 'Save' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

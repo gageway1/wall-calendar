@@ -16,7 +16,12 @@
 
 <div class="cols" appSwipe (swipeLeft)="shift(1)" (swipeRight)="shift(-1)">
   @for (d of days(); track d.key) {
-    <section class="col card" [class.today]="d.isToday" [class.past]="d.isPast">
+    <section
+      class="col card"
+      [class.today]="d.isToday"
+      [class.past]="d.isPast"
+      (click)="quickAdd.open({ day: d.key })"
+    >
       <div class="head">
         <div>
           <div class="dow">{{ d.dow }}</div>

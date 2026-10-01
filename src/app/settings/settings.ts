@@ -3,6 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { EventsService } from '../core/events.service';
+import { KeyboardService } from '../core/keyboard.service';
 import { GoogleCalendar, GoogleStatus, PERSON_COLORS, Person } from '../core/models';
 import { PeopleService } from '../core/people.service';
 
@@ -16,6 +17,7 @@ export class Settings {
   private readonly events = inject(EventsService);
   protected readonly peopleSvc = inject(PeopleService);
   protected readonly colors = PERSON_COLORS;
+  protected readonly keyboard = inject(KeyboardService);
 
   private readonly query = toSignal(inject(ActivatedRoute).queryParamMap);
   protected readonly callbackError = computed(() => this.query()?.get('google_error'));
@@ -74,7 +76,7 @@ export class Settings {
     const used = new Set(this.peopleSvc.people().map((p) => p.color));
     const color = this.colors.find((c) => !used.has(c)) ?? this.colors[0];
     this.peopleSvc
-      .create({ name: cal.name, color, calendarId: cal.id })
+      .create({ name: cal.name, color, calendarId: cal.id, accessRole: cal.accessRole })
       // Initial sync runs server-side; give it a moment before refetching events.
       .subscribe(() => setTimeout(() => this.events.refresh(), 3000));
   }

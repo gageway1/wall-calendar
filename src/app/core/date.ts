@@ -81,3 +81,28 @@ export function describeWhen(ev: CalEvent): string {
     ? `${fmtDay.format(start)} · ${formatTime(ev.start)} – ${formatTime(ev.end)}`
     : `${fmtDay.format(start)} ${formatTime(ev.start)} – ${fmtDay.format(end)} ${formatTime(ev.end)}`;
 }
+
+/** Minutes since midnight → 12:00pm */
+export function formatMinutes(min: number): string {
+  const h = Math.floor(min / 60) % 24;
+  const m = min % 60;
+  return `${h % 12 || 12}:${String(m).padStart(2, '0')}${h < 12 ? 'am' : 'pm'}`;
+}
+
+/** 90 → "1 hr 30 min" */
+export function formatDuration(min: number): string {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return [h && `${h} hr`, m && `${m} min`].filter(Boolean).join(' ') || '0 min';
+}
+
+/** Whole days from a to b (DST-safe). */
+export function daysBetween(a: DayKey, b: DayKey): number {
+  return Math.round((parseDay(b).getTime() - parseDay(a).getTime()) / 86_400_000);
+}
+
+/** Local date + minutes since midnight → Date (DST-safe). */
+export function atMinutes(key: DayKey, min: number): Date {
+  const d = parseDay(key);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, min);
+}
