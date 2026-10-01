@@ -10,17 +10,14 @@
       <span>{{ n.label }}</span>
     </a>
   }
+  <button type="button" class="rail-add" aria-label="Add event" (click)="quickAdd.open()">
+    <app-icon name="plus" />
+  </button>
 </nav>
 
 <main class="content">
   <router-outlet />
 </main>
-
-@if (showAdd() && !quickAdd.request() && !dialogs.state()) {
-  <button type="button" class="fab" aria-label="Add event" (click)="quickAdd.open()">
-    <app-icon name="plus" />
-  </button>
-}
 
 <app-dialog />
 

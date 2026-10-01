@@ -1,8 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { filter, map } from 'rxjs';
-import { DialogService } from './core/dialog.service';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { QuickAddService } from './core/quick-add.service';
 import { QuickAdd } from './quick-add/quick-add';
 import { AppDialog } from './shared/app-dialog';
@@ -27,7 +24,6 @@ import { Toasts } from './shared/toasts';
 })
 export class App {
   protected readonly quickAdd = inject(QuickAddService);
-  protected readonly dialogs = inject(DialogService);
 
   protected readonly nav: { path: string; label: string; icon: IconName }[] = [
     { path: '/', label: 'Home', icon: 'home' },
@@ -37,13 +33,4 @@ export class App {
     { path: '/meals', label: 'Meals', icon: 'meals' },
     { path: '/settings', label: 'Settings', icon: 'settings' },
   ];
-
-  /** The add-event button floats over the calendar screens. */
-  protected readonly showAdd = toSignal(
-    inject(Router).events.pipe(
-      filter((e) => e instanceof NavigationEnd),
-      map((e) => !/^\/(settings|chores|meals)/.test(e.urlAfterRedirects)),
-    ),
-    { initialValue: false },
-  );
 }

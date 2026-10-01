@@ -3,6 +3,8 @@
   inset: 0;
   display: grid;
   grid-template-columns: auto 1fr;
+  // One full-height row, so the rail always reaches the bottom of the screen.
+  grid-template-rows: minmax(0, 1fr);
 }
 
 .rail {
@@ -41,21 +43,20 @@
   padding: var(--gap);
 }
 
-.fab {
+.rail-add {
   all: unset;
-  position: fixed;
-  right: 2rem;
-  bottom: 2rem;
-  z-index: 50;
-  width: 5rem;
-  height: 5rem;
+  // Pinned to the bottom of the rail, out of the way of page content.
+  margin-top: auto;
+  align-self: center;
+  width: 4.5rem;
+  height: 4.5rem;
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: var(--accent);
   color: var(--bg);
-  font-size: 1.75rem; // sizes the icon (1.5em)
-  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.45);
+  font-size: 1.6rem; // sizes the icon (1.5em)
+  box-shadow: 0 0.4rem 1.2rem rgb(0 0 0 / 0.4);
   cursor: pointer;
 
   &:active {
