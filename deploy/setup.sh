@@ -140,6 +140,11 @@ RestartSec=3
 WantedBy=graphical.target
 EOF
 
+step "Touch panel udev rules"
+install -m 0644 "$APP_DIR/deploy/99-wall-touch.rules" /etc/udev/rules.d/99-wall-touch.rules
+udevadm control --reload
+udevadm trigger --subsystem-match=input --action=change
+
 step "Nightly DB backup (keeps 14)"
 cat >/etc/systemd/system/wall-backup.service <<EOF
 [Unit]

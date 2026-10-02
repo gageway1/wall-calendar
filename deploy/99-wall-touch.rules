@@ -1,0 +1,9 @@
+# Installed to /etc/udev/rules.d/ by deploy/setup.sh.
+
+# Touchscreens plugged in after the kiosk started don't get touch in Chrome until cage restarts.
+# try-restart is a no-op at boot (kiosk not running yet), so this only fires on a real hotplug.
+ACTION=="add", SUBSYSTEM=="input", KERNEL=="event*", ENV{ID_INPUT_TOUCHSCREEN}=="1", RUN+="/usr/bin/systemctl --no-block try-restart wall-kiosk.service"
+
+# The AOC panel (ILITEK 222a:0001) also exposes a fake absolute mouse. Hide it from libinput so cage
+# shows no cursor; touch comes through the separate multitouch interface. A real mouse still works.
+ACTION=="add|change", SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="ILITEK ILITEK-TP Mouse", ENV{LIBINPUT_IGNORE_DEVICE}="1"

@@ -71,6 +71,10 @@ npm run serve:prod   # node dist/wall-calendar/server/server.mjs (PORT, default 
   with a stack. Sync logs when an outage starts and when it ends, not every attempt.
 - The long-press context menu is blocked for touch and pen only (`App.blockTouchMenu`); mouse
   right-click still works for Inspect.
+- **Touch panel on the box:** the AOC is an ILITEK `222a:0001` (hid-multitouch, works out of the box).
+  Touch only works if cage starts *after* the panel is connected, and the panel's fake "Mouse"
+  interface makes cage show a cursor. `deploy/99-wall-touch.rules` handles both. The box is
+  reachable as `ssh wall` (key auth; `sudo -n` only works for restarting the two services).
 - **Windows shell:** heredocs mangle `\n` and backslashes in inline Python/JS. Write scripts to
   files instead. Run `npx prettier --write` after edits.
 - The school's dining *page* is behind a Fastly "Client Challenge" (bot check). Use the
