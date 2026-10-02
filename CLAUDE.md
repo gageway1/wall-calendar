@@ -130,7 +130,7 @@ a 1px pixel shift every 15 min, and a nightly self-reload at 3am (only when idle
 - Mounting: a 3D-printed OptiPlex VESA bracket (PETG/ABS, not PLA; 4+ walls) screwed to the
   wall, **not** hung off the monitor's VESA mount. Keep the front and back vents clear.
 
-### Box setup plan (build this as `deploy/setup.sh` plus systemd units)
+### Box setup — implemented in `deploy/` (runbook: `deploy/README.md`; `sudo ./deploy/setup.sh`, `npm run deploy`). Uses the Google Chrome deb, not the Chromium snap. Original plan:
 
 1. Ubuntu Server LTS with Node 24 (NodeSource or nvm system-wide). Set the timezone with
    `timedatectl set-timezone America/Indiana/Indianapolis`. Install `fonts-noto-color-emoji`
