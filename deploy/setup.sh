@@ -140,6 +140,17 @@ RestartSec=3
 WantedBy=graphical.target
 EOF
 
+step "Audio: HDMI to the monitor's speaker (timer chime)"
+usermod -aG audio "$APP_USER"
+# The AOC shows up on the first HDMI pin (eld#2.0), which is PCM device 3 on this Intel HDA.
+cat >/etc/asound.conf <<'EOF'
+defaults.pcm.card 0
+defaults.pcm.device 3
+defaults.ctl.card 0
+EOF
+amixer -q -c 0 sset 'IEC958',0 on || true
+alsactl store || true
+
 step "Touch panel udev rules"
 install -m 0644 "$APP_DIR/deploy/99-wall-touch.rules" /etc/udev/rules.d/99-wall-touch.rules
 udevadm control --reload
