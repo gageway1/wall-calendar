@@ -19,7 +19,7 @@
 
   @if (current(); as w) {
     <div class="now-weather">
-      <span class="icon">{{ describe(w.current.code, w.current.isDay).icon }}</span>
+      <span class="icon wx-icon">{{ describe(w.current.code, w.current.isDay).icon }}</span>
       <div>
         <div class="temp">{{ w.current.temp }}°</div>
         <div class="muted">
@@ -114,7 +114,10 @@
             <span class="dow">{{ d.label }}</span>
             @if (d.forecast; as f) {
               <span class="wx">
-                {{ describe(f.code).icon }} {{ f.high }}°<span class="muted">{{ f.low }}°</span>
+                <span class="wx-icon">{{ describe(f.code).icon }}</span> {{ f.high }}°<span
+                  class="muted"
+                  >{{ f.low }}°</span
+                >
               </span>
             }
           </div>

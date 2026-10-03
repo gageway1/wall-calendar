@@ -32,7 +32,7 @@ Calendar and Google Tasks apps.
   dialogs, toasts, PIN pad, timer, sleep screen…), and there is one folder per screen (home,
   week, month, chores, meals, lists, settings, quick-add).
 - `src/server/`: `api.ts` is the router plus error mapping. `db.ts` holds the append-only
-  migrations (6 so far; never edit a shipped one). Also `google/` (OAuth, Calendar, Tasks,
+  migrations (7 so far; never edit a shipped one). Also `google/` (OAuth, Calendar, Tasks,
   sync), `lunch/` (school menus), `chores/logic.ts` (pure schedule and streak rules), `routes/`,
   `logger.ts`, and `pin.ts`.
 - `data/` is gitignored and holds `wall.db` plus `logs/wall-YYYY-MM-DD.log` (JSON lines, kept
@@ -45,7 +45,7 @@ Calendar and Google Tasks apps.
 
 ```sh
 npm start            # dev, http://localhost:4200 (Express /api runs inside ng serve)
-npm test             # vitest via `ng test --watch=false` (68 tests)
+npm test             # vitest via `ng test --watch=false` (77 tests)
 npm run build        # -> dist/wall-calendar
 npm run serve:prod   # node dist/wall-calendar/server/server.mjs (PORT, default 4000)
 ```
@@ -106,17 +106,59 @@ timer, a guest Wi-Fi QR code, night mode (10pm–6am dim drifting clock; tap to 
 a 1px pixel shift every 15 min, and a nightly self-reload at 3am (only when idle and only if
 `/api/health` answers).
 
-## Not yet verified live (needs the user's real Google account)
+## Status (2026-10-02)
 
-- Adding, editing and deleting events from the wall against real Google Calendar.
-- Lists against real Google Tasks. This needs the **Google Tasks API** enabled, the
-  `https://www.googleapis.com/auth/tasks` scope added under Data Access, and one disconnect and
-  reconnect.
-- One-time user steps: import `G:\downloads\GWS-2026-27-school-calendar.ics` into a "School"
-  calendar in the household Google account, then link it in Settings → People. Set Settings →
-  School lunch → Skylar.
+**Done and on the wall.** It's mounted, wired to the router by Ethernet, and boots to the
+calendar full screen. Touch, the HDMI chime, night mode, and kiosk lockdown all work, and so do
+Google Calendar add/edit/delete, Google Tasks, and the imported School calendar. `ssh wall`
+works over Tailscale. Ship changes with `npm run deploy`.
 
-## Next: deployment (M5)
+- Not explicitly tested yet: auto power-on after a power cut (BIOS AC Recovery).
+
+## Themes
+
+- Built-ins live in `src/server/themes.ts` and are upserted into the `themes` table on every
+  start, so edit colors there and redeploy (no migration needed). A theme is a partial map of
+  CSS custom properties layered over the Dark defaults in `styles.scss` (`--bg`, `--surface`,
+  `--surface-2`, `--text`, `--text-muted`, `--accent`, `--danger`, `--success`, `--warn`,
+  `--press`, `--card-shadow`, `--emoji-filter`, `--font-body`, `--font-display`).
+- The left nav has its own tokens: `--rail-bg` (any `background` value, e.g. the Christmas
+  candy-cane gradient), `--rail-fg`, `--rail-item-bg` (button backing, for busy backgrounds),
+  `--rail-active-bg`/`--rail-active-fg`, `--rail-edge` (box-shadow), `--rail-add-ring`
+  (box-shadow around the + button), `--rail-item-shadow`, and borders: `--rail-border-width`
+  (default 0px; gaps grow by the width and the border comes out of the button padding, so
+  sizes don't change) with `--rail-item-border-color`, `--rail-tool-border-color` and
+  `--rail-active-border-color` (both default to the item color). Tokens that default to other tokens must also be reset
+  in Settings' `previewStyle`, or previews pick up the active theme's value.
+- Theme images live in `public/themes/<id>/`. The Halloween cobwebs + spider are SVGs generated
+  by `node scripts/halloween-webs.mjs` (tweak sizes/rings there, rerun, redeploy); they're
+  layered into Halloween's `--rail-bg` with a translucent `--rail-item-bg` so labels stay
+  readable. Winter's snowfall tile comes from `node scripts/winter-snow.mjs` the same way.
+- Seasonal roadmap (one at a time; the user checks visuals themselves, no screenshot loops):
+  Jan Winter (light, done), Feb Valentine's (dark, pink nav with hearts, done), Mar St.
+  Patrick's (dark, shamrock nav, done), Apr Rain (dark, rain nav, done), May Cinco de Mayo (dark, papel picado nav, done), Jun Summer (dark ocean blue +
+  sand yellow, waves-to-beach nav, done), Jul 4th of July (dark, flag nav, done), Aug School (dark chalkboard, notebook-paper nav, done), Sep Fall (dark, falling-leaves nav, done). Oct Halloween,
+  Nov Thanksgiving (plaid nav), Dec Christmas and Christmas Night exist. Pattern tiles come from
+  `scripts/*.mjs` generators (hearts, snow, webs).
+- `season: { start, end }` (MM-DD, inclusive, may wrap past New Year) makes a theme take over in
+  Automatic mode. The setting `theme` = `{ selected: 'auto' | id, everyday: id }`; picking a
+  theme pins it. `ThemeService` resolves the active theme from the local date and sets the
+  tokens on `<html>` plus `data-theme="<id>"` (a hook for theme-specific CSS later).
+- Use the tokens, not hex values, in component styles. The night screen, toasts and the timer
+  overlay are deliberately theme-independent.
+- Fonts are bundled in `public/fonts/` (Creepster for Halloween headings and the clock), since
+  the kiosk shouldn't depend on Google Fonts.
+
+## Later / backlog
+
+- **More seasonal themes:** Thanksgiving (Nov), Christmas (Dec), Valentine's (Feb), St.
+  Patrick's (Mar), Independence Day (Jul), etc. Each is just an entry in `themes.ts`.
+- **Theme decorations:** SVG accents or animation (e.g. spiders) keyed off `data-theme`.
+
+- **Lists: show task details.** Google Tasks items currently show only the title. Notes, due
+  date, and maybe subtasks aren't displayed, so the Lists screen is of limited use. Not urgent.
+
+## Deployment (M5, done; reference)
 
 ### Hardware
 

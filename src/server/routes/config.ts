@@ -1,6 +1,6 @@
 import express from 'express';
 import QRCode from 'qrcode';
-import { getSetting, setSetting } from '../db';
+import { db, getSetting, setSetting } from '../db';
 
 /** Wall-wide display and guest settings, stored on the box. */
 export const config = express.Router();
@@ -104,4 +104,57 @@ config.get('/wifi/qr.svg', async (_req, res) => {
     errorCorrectionLevel: 'M',
   });
   res.type('image/svg+xml').set('cache-control', 'no-store').send(svg);
+});
+
+interface ThemeRow {
+  id: string;
+  name: string;
+  scheme: 'dark' | 'light';
+  tokens: string;
+  season_start: string | null;
+  season_end: string | null;
+}
+
+function listThemes() {
+  const rows = db()
+    .prepare(
+      'SELECT id, name, scheme, tokens, season_start, season_end FROM themes ORDER BY sort_order, name',
+    )
+    .all() as unknown as ThemeRow[];
+  return rows.map((r) => ({
+    id: r.id,
+    name: r.name,
+    scheme: r.scheme,
+    tokens: JSON.parse(r.tokens) as Record<string, string>,
+    season: r.season_start && r.season_end ? { start: r.season_start, end: r.season_end } : null,
+  }));
+}
+
+/** `selected`: 'auto' (seasonal themes on their dates, else `everyday`) or a theme id to pin. */
+const THEME_DEFAULTS = { selected: 'auto', everyday: 'dark' };
+
+function themePref() {
+  const raw = getSetting('theme');
+  try {
+    return raw ? { ...THEME_DEFAULTS, ...JSON.parse(raw) } : THEME_DEFAULTS;
+  } catch {
+    return THEME_DEFAULTS;
+  }
+}
+
+config.get('/theme', (_req, res) => {
+  res.json({ themes: listThemes(), ...themePref() });
+});
+
+config.put('/theme', (req, res) => {
+  const { selected, everyday } = req.body ?? {};
+  const themes = listThemes();
+  const known = (id: unknown) => themes.some((t) => t.id === id);
+  const everydayOk = themes.some((t) => t.id === everyday && !t.season);
+  if (!(selected === 'auto' || known(selected)) || !everydayOk) {
+    res.status(400).json({ error: 'invalid theme' });
+    return;
+  }
+  setSetting('theme', JSON.stringify({ selected, everyday }));
+  res.json({ themes, selected, everyday });
 });

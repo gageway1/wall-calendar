@@ -13,6 +13,7 @@
 }
 
 .clock {
+  font-family: var(--font-display);
   font-size: 5.5rem;
   font-weight: 300;
   line-height: 1;
@@ -304,7 +305,7 @@
 
 .overdue {
   font-size: 0.85rem;
-  color: #ffa94d;
+  color: var(--warn);
 }
 
 .empty a {

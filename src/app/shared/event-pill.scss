@@ -28,7 +28,7 @@
   }
 
   &:active {
-    filter: brightness(1.25);
+    filter: var(--press);
   }
 }
 

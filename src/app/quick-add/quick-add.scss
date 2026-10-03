@@ -132,7 +132,7 @@
   cursor: pointer;
 
   &:active {
-    filter: brightness(1.3);
+    filter: var(--press);
   }
 }
 

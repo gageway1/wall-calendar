@@ -1,6 +1,7 @@
 import type { DatabaseSync } from 'node:sqlite';
 import { join } from 'node:path';
 import { dataDir } from './paths';
+import { BUILTIN_THEMES } from './themes';
 
 // Loaded at runtime: esbuild rewrites `node:sqlite` to the nonexistent bare `sqlite`.
 const { DatabaseSync: Database } = process.getBuiltinModule(
@@ -15,6 +16,7 @@ export function db(): DatabaseSync {
     instance = new Database(join(dataDir(), 'wall.db'));
     instance.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
     migrate(instance);
+    seedThemes(instance);
   }
   return instance;
 }
@@ -119,6 +121,19 @@ const migrations: string[] = [
     updated_at TEXT NOT NULL
   );
   `,
+  `
+  -- Color/font themes. Built-ins are upserted from themes.ts on every start (see seedThemes).
+  CREATE TABLE themes (
+    id           TEXT PRIMARY KEY,
+    name         TEXT NOT NULL,
+    scheme       TEXT NOT NULL DEFAULT 'dark', -- dark | light (native controls, scrollbars)
+    tokens       TEXT NOT NULL,                -- JSON: CSS custom property -> value
+    season_start TEXT,                         -- MM-DD; with season_end, Automatic uses it then
+    season_end   TEXT,
+    sort_order   INTEGER NOT NULL DEFAULT 0,
+    builtin      INTEGER NOT NULL DEFAULT 0
+  );
+  `,
 ];
 
 function migrate(db: DatabaseSync) {
@@ -135,6 +150,29 @@ function migrate(db: DatabaseSync) {
       throw err;
     }
   }
+}
+
+function seedThemes(db: DatabaseSync) {
+  const upsert = db.prepare(`
+    INSERT INTO themes (id, name, scheme, tokens, season_start, season_end, sort_order, builtin)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+    ON CONFLICT(id) DO UPDATE SET
+      name = excluded.name, scheme = excluded.scheme, tokens = excluded.tokens,
+      season_start = excluded.season_start, season_end = excluded.season_end,
+      sort_order = excluded.sort_order
+    WHERE builtin = 1
+  `);
+  BUILTIN_THEMES.forEach((t, i) =>
+    upsert.run(
+      t.id,
+      t.name,
+      t.scheme,
+      JSON.stringify(t.tokens),
+      t.season?.start ?? null,
+      t.season?.end ?? null,
+      i,
+    ),
+  );
 }
 
 export function getSetting(key: string): string | undefined {

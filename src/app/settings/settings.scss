@@ -33,11 +33,11 @@ code {
   border-radius: var(--radius-sm);
 
   &.error {
-    background: color-mix(in srgb, #ff6b6b 20%, var(--surface));
+    background: color-mix(in srgb, var(--danger) 20%, var(--surface));
   }
 
   &.ok {
-    background: color-mix(in srgb, #51cf66 20%, var(--surface));
+    background: color-mix(in srgb, var(--success) 20%, var(--surface));
   }
 }
 
@@ -206,14 +206,14 @@ code {
   grid-template-columns: 12rem 5rem 1fr;
   gap: 0.75rem;
   padding: 0.5rem 0.75rem;
-  border-left: 0.25rem solid #ff6b6b;
+  border-left: 0.25rem solid var(--danger);
   border-radius: 6px;
   background: var(--bg);
   font-size: 0.9rem;
   user-select: text;
 
   &.warn {
-    border-left-color: #ffa94d;
+    border-left-color: var(--warn);
   }
 }
 
@@ -300,9 +300,122 @@ code {
 }
 
 .warn {
-  color: #ffa94d;
+  color: var(--warn);
 }
 
 .lunch-actions {
   margin-top: 1rem;
+}
+
+.themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.theme-tile {
+  all: unset;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.6rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  cursor: pointer;
+  box-shadow: 0 0 0 0.2rem transparent;
+
+  &.on {
+    box-shadow: 0 0 0 0.2rem var(--accent);
+  }
+
+  &:active {
+    filter: var(--press);
+  }
+}
+
+.theme-name {
+  font-weight: 600;
+  padding: 0 0.2rem;
+}
+
+.theme-tile .muted {
+  padding: 0 0.2rem;
+}
+
+// Drawn entirely from the previewed theme's own tokens (set inline by previewStyle).
+.theme-preview {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 0.6rem;
+  height: 5rem;
+  padding: 0.7rem 0.7rem 0.7rem 0;
+  overflow: hidden;
+  border-radius: 0.6rem;
+  background: var(--bg);
+  color: var(--text);
+  // Keeps a light preview visible on a light card.
+  outline: 1px solid rgb(128 128 128 / 0.25);
+}
+
+.tp-rail {
+  align-self: stretch;
+  width: 1.1rem;
+  margin: -0.7rem 0;
+  background: var(--rail-bg);
+}
+
+.tp-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.tp-card {
+  display: grid;
+  gap: 0.4rem;
+  align-content: center;
+  height: 100%;
+  padding: 0 0.6rem;
+  border-radius: 0.4rem;
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.tp-dot {
+  width: 1.2rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.tp-line {
+  height: 0.35rem;
+  border-radius: 999px;
+  background: var(--text-muted);
+  opacity: 0.6;
+}
+
+.tp-badge {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.everyday {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+
+  .seg {
+    margin-top: 0;
+  }
 }

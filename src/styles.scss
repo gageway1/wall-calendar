@@ -1,3 +1,66 @@
+@font-face {
+  font-family: 'Creepster';
+  src: url('/fonts/creepster.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Thanksgiving';
+  src: url('/fonts/Thanksgiving.woff') format('woff');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Christmas';
+  src: url('/fonts/MountainsofChristmas-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Valentines';
+  src: url('/fonts/pacifico.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'StPatricks';
+  src: url('/fonts/uncial-antiqua.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Rain';
+  src: url('/fonts/kalam.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Cinco';
+  src: url('/fonts/lobster.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Summer';
+  src: url('/fonts/fredoka.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'July';
+  src: url('/fonts/alfa-slab-one.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'School';
+  src: url('/fonts/cabin-sketch.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fall';
+  src: url('/fonts/yeseva-one.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Winter';
+  src: url('/fonts/snowburst-one.woff2') format('woff2');
+  font-display: swap;
+}
+
+// Theme tokens. These are the Dark defaults; ThemeService layers the active theme's values
+// (src/server/themes.ts) over them on <html>, so a theme only lists what it changes.
 :root {
   color-scheme: dark;
   --bg: #0f1115;
@@ -6,6 +69,39 @@
   --text: #eef0f4;
   --text-muted: #9aa1ae;
   --accent: #6cb6ff;
+  --danger: #ff6b6b;
+  --success: #51cf66;
+  --warn: #ffa94d;
+  // Pressed-button feedback: brighten on dark themes, darken on light ones.
+  --press: brightness(1.3);
+  --card-shadow: none;
+  // Weather emoji (white clouds) need an outline on light backgrounds.
+  --emoji-filter: none;
+  --font-body: Inter, system-ui, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+  // Headings and the big clock; seasonal themes swap in something fun.
+  --font-display: var(--font-body);
+
+  // Left nav. --rail-bg takes any `background` value (color, gradient, url()); on a busy one,
+  // give the buttons a backing with --rail-item-bg so labels stay readable.
+  --rail-bg: var(--surface);
+  --rail-fg: var(--text-muted);
+  --rail-item-bg: transparent;
+  --rail-active-bg: var(--surface-2);
+  --rail-active-fg: var(--accent);
+  --rail-edge: none;
+
+  // Ring around the + button, for when it would blend into --rail-bg. A box-shadow value.
+  --rail-add-ring: 0 0 #0000;
+  // Borders on the nav buttons and tool circles. Gaps grow with the width (the buttons keep
+  // their size), so 0px, the default, means no border and the original layout.
+  --rail-border-width: 0px;
+  --rail-item-border-color: transparent;
+  --rail-tool-border-color: var(--rail-item-border-color);
+  --rail-active-border-color: var(--rail-item-border-color);
+  // Drop shadow under the nav buttons and tools. A box-shadow value.
+  --rail-item-shadow: none;
+
+  // Non-theme layout tokens.
   --radius: 20px;
   --radius-sm: 12px;
   --gap: 1.5rem;
@@ -26,7 +122,7 @@ body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: Inter, system-ui, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+  font-family: var(--font-body);
   overflow: hidden;
   // No pull-to-refresh or rubber-band bounce on the touch panel.
   overscroll-behavior: none;
@@ -34,6 +130,11 @@ body {
   user-select: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
 }
 
 h2 {
@@ -45,9 +146,14 @@ h2 {
 .card {
   background: var(--surface);
   border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
   padding: 1.5rem;
   min-height: 0;
   overflow: auto;
+}
+
+.wx-icon {
+  filter: var(--emoji-filter);
 }
 
 .muted {
@@ -95,7 +201,7 @@ h2 {
   white-space: nowrap;
 
   &:active:not(:disabled) {
-    filter: brightness(1.3);
+    filter: var(--press);
   }
 
   &:disabled {
@@ -113,7 +219,7 @@ h2 {
   }
 
   &.danger {
-    background: color-mix(in srgb, #ff6b6b 25%, var(--surface-2));
+    background: color-mix(in srgb, var(--danger) 25%, var(--surface-2));
   }
 }
 

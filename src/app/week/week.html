@@ -28,7 +28,9 @@
           <div class="num">{{ d.num }}</div>
         </div>
         @if (d.weather; as w) {
-          <div class="wx">{{ w.icon }} {{ w.high }}°</div>
+          <div class="wx">
+            <span class="wx-icon">{{ w.icon }}</span> {{ w.high }}°
+          </div>
         }
       </div>
       <div class="list">

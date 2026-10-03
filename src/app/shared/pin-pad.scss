@@ -47,10 +47,10 @@
 
 .message {
   min-height: 1.4rem;
-  color: #ff8787;
+  color: var(--danger);
 
   &.locked {
-    color: #ffa94d;
+    color: var(--warn);
   }
 }
 

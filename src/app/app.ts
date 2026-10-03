@@ -4,6 +4,7 @@ import { DialogService } from './core/dialog.service';
 import { NightlyReloadService } from './core/nightly-reload.service';
 import { QuickAddService } from './core/quick-add.service';
 import { SleepService } from './core/sleep.service';
+import { ThemeService } from './core/theme.service';
 import { TimerService } from './core/timer.service';
 import { WeatherService } from './core/weather.service';
 import { QuickAdd } from './quick-add/quick-add';
@@ -58,6 +59,7 @@ export class App implements OnDestroy {
   // Start weather at boot so the night screen has it even if Home was never opened.
   private readonly weather = inject(WeatherService);
   private readonly nightlyReload = inject(NightlyReloadService);
+  private readonly theme = inject(ThemeService);
 
   protected readonly wifiOpen = signal(false);
 

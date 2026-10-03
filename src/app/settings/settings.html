@@ -4,6 +4,62 @@
 
 <div class="scroll">
   <section class="card">
+    <h2>Theme</h2>
+    <p class="muted small">
+      Automatic switches to holiday themes on their dates. Pick a theme to keep it all year.
+    </p>
+    <div class="themes">
+      <button
+        type="button"
+        class="theme-tile"
+        [class.on]="theme.pref().selected === 'auto'"
+        (click)="pickTheme('auto')"
+      >
+        <span class="theme-preview" [style]="previewStyle(theme.auto())">
+          <span class="tp-rail"></span>
+          <span class="tp-title">Aa</span>
+          <span class="tp-card"><span class="tp-dot"></span><span class="tp-line"></span></span>
+          <span class="tp-badge">Auto</span>
+        </span>
+        <span class="theme-name">Automatic</span>
+        <span class="muted small">Now: {{ theme.auto()?.name }}</span>
+      </button>
+      @for (t of theme.themes(); track t.id) {
+        <button
+          type="button"
+          class="theme-tile"
+          [class.on]="theme.pref().selected === t.id"
+          (click)="pickTheme(t.id)"
+        >
+          <span class="theme-preview" [style]="previewStyle(t)">
+            <span class="tp-rail"></span>
+            <span class="tp-title">Aa</span>
+            <span class="tp-card"><span class="tp-dot"></span><span class="tp-line"></span></span>
+          </span>
+          <span class="theme-name">{{ t.name }}</span>
+          <span class="muted small">{{ t.season ? seasonLabel(t.season) : 'Everyday' }}</span>
+        </button>
+      }
+    </div>
+    @if (theme.pref().selected === 'auto') {
+      <div class="everyday">
+        <span class="muted small">Outside holidays</span>
+        <div class="seg">
+          @for (t of everydayThemes(); track t.id) {
+            <button
+              type="button"
+              [class.on]="theme.pref().everyday === t.id"
+              (click)="pickEveryday(t.id)"
+            >
+              {{ t.name }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="card">
     <h2>Parent PIN</h2>
     @if (pin.status(); as ps) {
       @if (ps.set) {

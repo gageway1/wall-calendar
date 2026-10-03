@@ -28,6 +28,8 @@ export class SleepService implements OnDestroy {
   private readonly clock = inject(ClockService);
 
   readonly config = signal<SleepConfig>({ enabled: true, start: 22 * 60, end: 6 * 60 });
+  /** Until the box's schedule arrives, stay awake: the default could wrongly sleep at boot. */
+  private readonly loaded = signal(false);
   private readonly wakeUntil = signal(0);
   private readonly previewUntil = signal(0);
   private readonly timer = setInterval(() => this.load(), RELOAD_MS);
@@ -36,7 +38,7 @@ export class SleepService implements OnDestroy {
     const now = this.clock.now();
     if (now.getTime() < this.previewUntil()) return true;
     const c = this.config();
-    if (!c.enabled || now.getTime() < this.wakeUntil()) return false;
+    if (!this.loaded() || !c.enabled || now.getTime() < this.wakeUntil()) return false;
     return inWindow(now.getHours() * 60 + now.getMinutes(), c.start, c.end);
   });
 
@@ -46,13 +48,17 @@ export class SleepService implements OnDestroy {
 
   load() {
     this.http.get<SleepConfig>('/api/config/sleep').subscribe({
-      next: (c) => this.config.set(c),
+      next: (c) => {
+        this.config.set(c);
+        this.loaded.set(true);
+      },
       error: () => {},
     });
   }
 
   save(c: SleepConfig) {
     this.config.set(c);
+    this.loaded.set(true);
     return this.http.put<SleepConfig>('/api/config/sleep', c);
   }
 

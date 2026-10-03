@@ -125,7 +125,7 @@
   color: var(--text-muted);
 
   &.overdue {
-    color: #ffa94d;
+    color: var(--warn);
   }
 }
 

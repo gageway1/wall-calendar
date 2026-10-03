@@ -12,6 +12,7 @@ import { LunchService } from '../core/lunch.service';
 import { SleepConfig, SleepService } from '../core/sleep.service';
 import { formatMinutes } from '../core/date';
 import { TextPromptService } from '../core/text-prompt.service';
+import { Theme, ThemeService, seasonLabel } from '../core/theme.service';
 import { GENERIC_ERROR, ToastService } from '../core/toast.service';
 
 interface LogEntry {
@@ -40,6 +41,10 @@ export class Settings {
   protected readonly lunch = inject(LunchService);
   protected readonly lunchSyncing = signal(false);
   protected readonly formatMinutes = formatMinutes;
+  protected readonly theme = inject(ThemeService);
+  protected readonly seasonLabel = seasonLabel;
+  /** Themes Automatic can fall back to outside holidays. */
+  protected readonly everydayThemes = computed(() => this.theme.themes().filter((t) => !t.season));
   protected readonly wifi = signal<{
     configured: boolean;
     ssid?: string;
@@ -184,6 +189,28 @@ export class Settings {
   protected stepTime(key: 'start' | 'end', delta: number) {
     const v = (this.sleep.config()[key] + delta + 1440) % 1440;
     this.saveSleep({ [key]: v });
+  }
+
+  // --- Theme -------------------------------------------------------------
+
+  protected pickTheme(selected: string) {
+    this.theme.save({ selected }).subscribe();
+  }
+
+  protected pickEveryday(everyday: string) {
+    this.theme.save({ everyday }).subscribe();
+  }
+
+  /** Scopes a theme's colors to its preview swatch (the rest of the page keeps the active theme). */
+  protected previewStyle(t: Theme | undefined): Record<string, string> {
+    if (!t) return {};
+    // Reset tokens that default to other tokens, so they resolve against this theme, not the
+    // active one (custom properties inherit as computed values).
+    return {
+      '--font-display': 'var(--font-body)',
+      '--rail-bg': 'var(--surface)',
+      ...t.tokens,
+    };
   }
 
   // --- School lunch ------------------------------------------------------

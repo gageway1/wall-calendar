@@ -236,7 +236,7 @@ screen, and **[ Back ]** goes back.
    ip -4 addr
    ```
    Look for the entry that isn't `lo`, e.g. `eno1`, and the line under it starting with
-   **`inet 192.168.137.X/24`**. Make sure it matches what you wrote down; if it's different,
+   **`inet 192.168.137.178/24`**. Make sure it matches what you wrote down; if it's different,
    **write down the new one.** That's the box's address on the cable.
 4. Check internet:
    ```sh
@@ -457,11 +457,18 @@ says "Everything up-to-date" and the rest still runs. That's fine.
   1. **[PC]** Run `ssh -L 4000:localhost:4000 wall` and leave that window open.
   2. **[PC]** In your browser, open **http://localhost:4000/settings** and connect Google
      there.
-- **Timer chime sound (HDMI audio):** `setup.sh` points sound at HDMI device 3, which is where
-  the AOC showed up. Start a short kids' timer and listen. If you hear nothing, check the
-  AOC's own volume in its on-screen menu. To test from the terminal, run
-  `sudo speaker-test -c 2 -t wav -l 1`. Plain `aplay -l` as `gage` shows "no soundcards" until
-  you log out and back in after setup; that's expected.
+- **Timer chime sound (HDMI audio):** on the box, run `aplay -l` to list sound devices. Look
+  for lines with **HDMI**. Test each one (Ctrl+C stops it) until you hear the AOC speaker:
+  ```sh
+  speaker-test -D plughw:0,3 -c2 -t wav
+  speaker-test -D plughw:0,7 -c2 -t wav
+  speaker-test -D plughw:0,8 -c2 -t wav
+  ```
+  Then make the one that worked the default. This example uses device 3:
+  ```sh
+  printf 'defaults.pcm.card 0\ndefaults.pcm.device 3\n' | sudo tee /etc/asound.conf
+  sudo systemctl restart wall-kiosk
+  ```
 
 ### Wi-Fi (once the box has a Wi-Fi card or USB adapter)
 

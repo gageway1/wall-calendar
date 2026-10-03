@@ -58,7 +58,7 @@
   cursor: pointer;
 
   &:active:not(:disabled) {
-    filter: brightness(1.2);
+    filter: var(--press);
   }
 
   &:disabled {

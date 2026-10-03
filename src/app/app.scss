@@ -10,9 +10,13 @@
 .rail {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: calc(0.5rem + var(--rail-border-width));
   padding: var(--gap) 0.5rem;
-  background: var(--surface);
+  background: var(--rail-bg);
+  box-shadow: var(--rail-edge);
+  // Keeps the edge shadow above the page.
+  position: relative;
+  z-index: 1;
 }
 
 .rail-item {
@@ -20,9 +24,13 @@
   justify-items: center;
   gap: 0.3rem;
   width: 5.5rem;
-  padding: 0.65rem 0;
+  // The border comes out of the padding, so a bordered button is no taller.
+  padding: calc(0.65rem - var(--rail-border-width)) 0;
   border-radius: var(--radius-sm);
-  color: var(--text-muted);
+  background: var(--rail-item-bg);
+  border: var(--rail-border-width) solid var(--rail-item-border-color);
+  box-shadow: var(--rail-item-shadow);
+  color: var(--rail-fg);
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
@@ -32,8 +40,9 @@
   }
 
   &.active {
-    background: var(--surface-2);
-    color: var(--accent);
+    background: var(--rail-active-bg);
+    border-color: var(--rail-active-border-color);
+    color: var(--rail-active-fg);
   }
 }
 
@@ -48,7 +57,7 @@
   margin-top: auto;
   display: grid;
   justify-items: center;
-  gap: 0.5rem;
+  gap: calc(0.5rem + var(--rail-border-width));
 }
 
 .tool {
@@ -57,19 +66,24 @@
   height: 3.4rem;
   display: grid;
   place-items: center;
+  // `all: unset` drops the global border-box; keep the border inside the 3.4rem circle.
+  box-sizing: border-box;
   border-radius: 50%;
-  color: var(--text-muted);
+  background: var(--rail-item-bg);
+  border: var(--rail-border-width) solid var(--rail-tool-border-color);
+  box-shadow: var(--rail-item-shadow);
+  color: var(--rail-fg);
   font-size: 1.1rem;
   cursor: pointer;
 
   &:active {
-    background: var(--surface-2);
+    background: var(--rail-active-bg);
   }
 
   &.running {
     width: 4.6rem;
     border-radius: 999px;
-    background: color-mix(in srgb, #51cf66 25%, var(--surface-2));
+    background: color-mix(in srgb, var(--success) 25%, var(--surface-2));
     color: var(--text);
   }
 }
@@ -82,6 +96,7 @@
 
 .rail-add {
   all: unset;
+  flex-shrink: 0;
   // Pinned to the bottom of the rail, out of the way of page content.
   margin-top: 0.5rem;
   align-self: center;
@@ -93,10 +108,12 @@
   background: var(--accent);
   color: var(--bg);
   font-size: 1.6rem; // sizes the icon (1.5em)
-  box-shadow: 0 0.4rem 1.2rem rgb(0 0 0 / 0.4);
+  box-shadow:
+    var(--rail-add-ring),
+    0 0.4rem 1.2rem rgb(0 0 0 / 0.4);
   cursor: pointer;
 
   &:active {
-    filter: brightness(1.15);
+    filter: var(--press);
   }
 }
