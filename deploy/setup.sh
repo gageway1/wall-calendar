@@ -87,6 +87,7 @@ step "Kiosk (cage + Chrome on tty1)"
 cat >/usr/local/bin/wall-kiosk <<EOF
 #!/usr/bin/env bash
 # Started by cage. Waits for the app, then runs Chrome full screen.
+# The debugging port (localhost only) lets loadtest/soak.mjs drive this screen over an ssh tunnel.
 for i in \$(seq 1 120); do
   curl -fs http://localhost:$PORT/api/health >/dev/null && break
   sleep 1
@@ -99,7 +100,8 @@ exec /usr/bin/google-chrome-stable \\
   --no-first-run --no-default-browser-check --password-store=basic \\
   --overscroll-history-navigation=0 --disable-pinch \\
   --autoplay-policy=no-user-gesture-required \\
-  --disable-features=Translate
+  --disable-features=Translate \\
+  --remote-debugging-port=9222
 EOF
 chmod 0755 /usr/local/bin/wall-kiosk
 

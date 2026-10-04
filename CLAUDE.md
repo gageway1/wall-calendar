@@ -82,6 +82,13 @@ npm run serve:prod   # node dist/wall-calendar/server/server.mjs (PORT, default 
   `https://thrillshare-cmsv2.services.thrillshare.com/api/v2/s/273117/menus?locale=en&query_id=49256`
   (it's paginated via `meta.links.next`). Don't spoof user-agents to get around the challenge.
 
+## Load testing
+
+`loadtest/README.md`: `deploy/monitor.mjs` (box resource sampler, run with sudo), `loadtest/api.mjs`
+(read-only API hammer), `loadtest/soak.mjs` (drives the kiosk's real Chrome through its
+localhost-only `--remote-debugging-port=9222` over an ssh tunnel). The user wants an idle
+baseline recorded before any load runs.
+
 ## Verifying UI changes
 
 - Unit tests: `npm test`.

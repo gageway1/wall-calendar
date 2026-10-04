@@ -46,3 +46,7 @@ Thumbs.db
 # Local data (SQLite, tokens)
 /data
 .env
+
+# Load test deps and results
+/loadtest/node_modules
+/loadtest/results
